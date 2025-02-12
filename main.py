@@ -31,6 +31,8 @@ class MyBot(commands.Bot):
 
 def main():
     exts = [
+        "cogs.clue",
+        "cogs.exchange",
         "cogs.tutorial",
     ]
     intents = discord.Intents.default()
