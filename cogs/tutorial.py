@@ -1,10 +1,17 @@
-from discord.ext import commands
 import discord
+import logging
+from discord.ext import commands
+
+logger = logging.getLogger("discord")
 
 
 class TutorialCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        logger.info("Tutorial Cog is ready.")
 
     @commands.hybrid_command()
     async def tutorial(self, ctx: commands.Context):
