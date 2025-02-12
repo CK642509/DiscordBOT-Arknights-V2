@@ -1,5 +1,6 @@
 import discord
 import logging
+from discord import app_commands
 from discord.ext import commands
 
 from settings import settings
@@ -34,6 +35,14 @@ class ClueCog(commands.Cog):
         """根據歷史訊息更新線索紀錄"""
         pass
 
+    @app_commands.command(name="更新線索")
+    async def set_clue(
+        self, interaction: discord.Interaction, user: discord.User, clue: str
+    ):
+        """幫指定玩家更新線索"""
+        # TODO: update clue
+        await interaction.response.send_message(f"{user} 的線索已更新為 {clue}")
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author == self.bot.user:
@@ -53,7 +62,7 @@ class ClueCog(commands.Cog):
         # Only listen to a info channel
         if before.channel.id != settings.info_channel_id:
             return
-        
+
         # TODO: update clue
 
     @commands.Cog.listener()
