@@ -39,7 +39,7 @@ def main():
     bot = MyBot(
         initial_extensions=exts,
         guild_id=settings.guild_id,
-        command_prefix="",
+        command_prefix="!",
         intents=intents,
     )
 
