@@ -1,6 +1,9 @@
 import logging
 from discord.ext import commands
 
+from settings import settings
+from utils.crud_clues import ClueProcessor
+
 logger = logging.getLogger("discord")
 
 
@@ -15,7 +18,9 @@ class ExchangeCog(commands.Cog):
     @commands.hybrid_command()
     async def result(self, ctx: commands.Context):
         """查看最佳做法"""
-        pass
+        result = ClueProcessor.get_result()
+        info_channel = self.bot.get_channel(settings.info_channel_id)
+        await info_channel.send(result)
 
     @commands.hybrid_command()
     async def exchange(self, ctx: commands.Context):

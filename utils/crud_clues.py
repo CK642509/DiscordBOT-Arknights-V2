@@ -7,11 +7,13 @@ class ClueProcessor:
     INPUT_FILENAME = "input.txt"
     DETAIL_FILENAME = "detail.txt"
     USER_DATA_FILENAME = "_user_data.txt"
+    RESULT_FILENAME = "results.txt"
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     input_path = os.path.join(script_dir, "exchange", INPUT_FILENAME)
     detail_path = os.path.join(script_dir, "exchange", DETAIL_FILENAME)
     user_data_path = os.path.join(script_dir, "exchange", USER_DATA_FILENAME)
+    result_path = os.path.join(script_dir, "exchange", RESULT_FILENAME)
 
     @staticmethod
     def get_users() -> str:
@@ -32,6 +34,12 @@ class ClueProcessor:
     def get_detail() -> str:
         """取得所有人的詳細線索資訊"""
         with open(ClueProcessor.detail_path, "r") as f:
+            return f.read()
+        
+    @staticmethod
+    def get_result() -> str:
+        """取得計算的結果"""
+        with open(ClueProcessor.result_path, "r", errors="replace", encoding="cp950") as f:
             return f.read()
 
     @staticmethod
