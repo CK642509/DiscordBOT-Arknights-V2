@@ -3,7 +3,7 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
-from settings import settings
+from config import Configs
 
 
 # https://github.com/Rapptz/discord.py/blob/master/examples/advanced_startup.py
@@ -30,6 +30,8 @@ class MyBot(commands.Bot):
 
 
 def main():
+    configs = Configs()
+
     exts = [
         "cogs.clue",
         "cogs.exchange",
@@ -40,12 +42,12 @@ def main():
 
     bot = MyBot(
         initial_extensions=exts,
-        guild_id=settings.guild_id,
+        guild_id=configs.discord.guild_id,
         command_prefix="!",
         intents=intents,
     )
 
-    bot.run(settings.token)
+    bot.run(configs.discord.bot.token)
 
 
 if __name__ == "__main__":
