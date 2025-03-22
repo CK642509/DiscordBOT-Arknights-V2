@@ -2,6 +2,7 @@ import os
 import re
 from datetime import date
 
+from config import Configs
 
 class ClueProcessor:
     INPUT_FILENAME = "input.txt"
@@ -14,6 +15,9 @@ class ClueProcessor:
     detail_path = os.path.join(script_dir, "exchange", DETAIL_FILENAME)
     user_data_path = os.path.join(script_dir, "exchange", USER_DATA_FILENAME)
     result_path = os.path.join(script_dir, "exchange", RESULT_FILENAME)
+
+    configs = Configs()
+    users = {user.id: user.name for user in configs.users}
 
     @staticmethod
     def get_users() -> str:
@@ -41,9 +45,35 @@ class ClueProcessor:
         """取得計算的結果"""
         with open(ClueProcessor.result_path, "r", errors="replace", encoding="cp950") as f:
             return f.read()
+        
+    @staticmethod
+    def handle_clue_message(author_id: int, content: str) -> str:
+        """處理線索訊息"""
+        def handle_single_clue_message(author_id: int, content: str) -> None:
+            try:
+                user_name = ClueProcessor.users[str(author_id)]
+                formatted_clue = ClueProcessor.format_clue(content)
+                ClueProcessor.update_clue(user_name, formatted_clue)
+            except KeyError:
+                print("User not found in config")
+
+        def handle_multiple_clue_message(content: str) -> None:
+            try:
+                for i in range(2):
+                    clue = content.split("\n")[i]
+                    user_name, clue_content = clue.split(":")
+                    formatted_clue = ClueProcessor.format_clue(clue_content)
+                    ClueProcessor.update_clue(user_name, formatted_clue)
+            except IndexError as e:
+                print(e)
+
+        if author_id == 525463925194489876:  # 更新線索 (小蔡)
+            handle_multiple_clue_message(content)
+        else:
+            handle_single_clue_message(author_id, content)
 
     @staticmethod
-    def update_clue(user_id: int, clue: str) -> None:
+    def update_clue(user_name: str, clue: str) -> None:
         """更新線索資訊"""
         # get previous clues
         text = ClueProcessor.get_clues()
@@ -54,7 +84,7 @@ class ClueProcessor:
         user_list = list(map(lambda x: x.lower(), user_list))
 
         # get the row number that needs to be updated
-        idx = user_list.index(user_id)
+        idx = user_list.index(user_name.strip().lower())
 
         # set new clues
         new_clue = clue.strip()

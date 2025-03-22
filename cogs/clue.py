@@ -1,9 +1,10 @@
 import discord
 import logging
 from discord import app_commands
+from discord.app_commands import Choice
 from discord.ext import commands
 
-from settings import settings
+from config import Configs
 from utils.crud_clues import ClueProcessor
 
 
@@ -11,6 +12,11 @@ logger = logging.getLogger("discord")
 
 
 class ClueCog(commands.Cog):
+    configs = Configs()
+    usernames = [user.name for user in configs.users]
+    clue_channel_id = configs.discord.clue_channel_id
+    info_channel_id = configs.discord.info_channel_id
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -35,46 +41,86 @@ class ClueCog(commands.Cog):
         """根據歷史訊息更新線索紀錄"""
         pass
 
+    # Although using Literal as user's type hint is much more readable, it's not flexible.
+    # For example, if we want to get the usernames from the config file, we can't use Literal. 
     @app_commands.command(name="更新線索")
+    @app_commands.choices(user=[Choice(name=user, value=user) for user in usernames])
     async def set_clue(
-        self, interaction: discord.Interaction, user: discord.User, clue: str
+        self,
+        interaction: discord.Interaction,
+        user: Choice[str],
+        clue: str
     ):
         """幫指定玩家更新線索"""
-        # TODO: update clue
-        await interaction.response.send_message(f"{user} 的線索已更新為 {clue}")
+        # update clue
+        formatted_clue = ClueProcessor.format_clue(clue)
+        ClueProcessor.update_clue(user.name, formatted_clue)
+
+        # send the updated detail to the info channel
+        detail = ClueProcessor.get_detail()
+        info_channel = self.bot.get_channel(self.info_channel_id)
+        await info_channel.send(f"```{detail}```")
+
+        await interaction.response.send_message(f"{user.name} 的線索已更新為 {clue}")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author == self.bot.user:
             return
 
-        # Only listen to a info channel
-        if message.channel.id != settings.info_channel_id:
-            return
-
-        # TODO: get clue from message and update
+        # if message.channel.id == self.info_channel_id:
+        #     return
+        
+        # update clue if the message is from the clue channel
+        if message.channel.id == self.clue_channel_id:
+            ClueProcessor.handle_clue_message(message.author.id, message.content)
+            
+            # send the updated detail to the info channel
+            detail = ClueProcessor.get_detail()
+            info_channel = self.bot.get_channel(self.info_channel_id)
+            await info_channel.send(f"```{detail}```")
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         if before.author == self.bot.user:
             return
 
-        # Only listen to a info channel
-        if before.channel.id != settings.info_channel_id:
+        # only listen to a clue channel
+        if before.channel.id != self.clue_channel_id:
+            return
+        
+        # only listen to message that is created within 1 day
+        if (discord.utils.utcnow() - before.created_at).days > 1:
             return
 
-        # TODO: update clue
+        # set the clue to the new content
+        ClueProcessor.handle_clue_message(before.author.id, after.content)
+        
+        # send the updated detail to the info channel
+        detail = ClueProcessor.get_detail()
+        info_channel = self.bot.get_channel(self.info_channel_id)
+        await info_channel.send(f"```{detail}```")
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         if message.author == self.bot.user:
             return
 
-        # Only listen to a info channel
-        if message.channel.id != settings.info_channel_id:
+        # only listen to a clue channel
+        if message.channel.id != self.clue_channel_id:
+            return
+        
+        # only listen to message that is created within 1 day
+        if (discord.utils.utcnow() - message.created_at).days > 1:
             return
 
-        # TODO: reset the clue to "0 0"
+        # reset the clue to "0 0"
+        ClueProcessor.handle_clue_message(message.author.id, "0 0")
+        
+        # send the updated detail to the info channel
+        detail = ClueProcessor.get_detail()
+        info_channel = self.bot.get_channel(self.info_channel_id)
+        await info_channel.send(f"```{detail}```")
 
 
 async def setup(bot: commands.Bot):
