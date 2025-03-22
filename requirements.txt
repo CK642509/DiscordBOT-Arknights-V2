@@ -1,2 +1,2 @@
 discord.py
-pydantic-settings
+pydantic-settings[toml]
