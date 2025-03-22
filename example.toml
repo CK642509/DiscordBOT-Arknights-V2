@@ -1,0 +1,11 @@
+[discord]
+guild_id = ""
+clue_channel_id = ""
+info_channel_id = ""
+
+[discord.bot]
+token = ""
+
+[[users]]
+id = ""
+name = ""
