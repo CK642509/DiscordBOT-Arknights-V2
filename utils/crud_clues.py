@@ -1,8 +1,11 @@
 import os
 import re
+import subprocess
 from datetime import date
+from sys import platform
 
 from config import Configs
+
 
 class ClueProcessor:
     INPUT_FILENAME = "input.txt"
@@ -15,6 +18,7 @@ class ClueProcessor:
     detail_path = os.path.join(script_dir, "exchange", DETAIL_FILENAME)
     user_data_path = os.path.join(script_dir, "exchange", USER_DATA_FILENAME)
     result_path = os.path.join(script_dir, "exchange", RESULT_FILENAME)
+    exe_dir = os.path.join(script_dir, "exchange")
 
     configs = Configs()
     users = {user.id: user.name for user in configs.users}
@@ -39,16 +43,19 @@ class ClueProcessor:
         """取得所有人的詳細線索資訊"""
         with open(ClueProcessor.detail_path, "r") as f:
             return f.read()
-        
+
     @staticmethod
     def get_result() -> str:
         """取得計算的結果"""
-        with open(ClueProcessor.result_path, "r", errors="replace", encoding="cp950") as f:
+        with open(
+            ClueProcessor.result_path, "r", errors="replace", encoding="cp950"
+        ) as f:
             return f.read()
-        
+
     @staticmethod
     def handle_clue_message(author_id: int, content: str) -> str:
         """處理線索訊息"""
+
         def handle_single_clue_message(author_id: int, content: str) -> None:
             try:
                 user_name = ClueProcessor.users[str(author_id)]
@@ -119,6 +126,13 @@ class ClueProcessor:
             return f"{result[0]} {result[1]}"
         else:
             return ""
+
+    @staticmethod
+    def exchange():
+        if platform == "linux" or platform == "linux2":
+            subprocess.run(["./utils/exchange/main"], cwd=ClueProcessor.exe_dir)
+        elif platform == "win32":
+            subprocess.run(["./utils/exchange/main.exe"], cwd=ClueProcessor.exe_dir)
 
 
 if __name__ == "__main__":

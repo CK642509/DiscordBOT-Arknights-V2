@@ -1,5 +1,6 @@
 import logging
 from discord.ext import commands
+from time import time
 
 from config import Configs
 from utils.crud_clues import ClueProcessor
@@ -30,7 +31,13 @@ class ExchangeCog(commands.Cog):
     @commands.hybrid_command()
     async def exchange(self, ctx: commands.Context):
         """開始計算最佳做法"""
-        pass
+        logger.info("Exchange command received.")
+        start_time = time()
+        ClueProcessor.exchange()
+        end_time = time()
+        elapsed_time = end_time - start_time
+        logger.info(f"Exchange command completed. Time elapsed: {elapsed_time:.2f} seconds.")
+        
 
 
 async def setup(bot: commands.Bot):
