@@ -27,6 +27,10 @@ class ExchangeCog(commands.Cog):
     @commands.hybrid_command()
     async def result(self, ctx: commands.Context):
         """查看最佳做法"""
+        if self.is_calculating:
+            await ctx.send("計算正在進行中，請稍後再試！")
+            return
+
         result = ClueProcessor.get_result()
         info_channel = self.bot.get_channel(self.info_channel_id)
         await info_channel.send(result)
