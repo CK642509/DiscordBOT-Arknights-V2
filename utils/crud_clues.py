@@ -133,31 +133,3 @@ class ClueProcessor:
             subprocess.run(["./utils/exchange/main"], cwd=ClueProcessor.exe_dir)
         elif platform == "win32":
             subprocess.run(["./utils/exchange/main.exe"], cwd=ClueProcessor.exe_dir)
-
-
-if __name__ == "__main__":
-    print(ClueProcessor.get_users())
-    print(ClueProcessor.get_clues())
-    print(ClueProcessor.get_detail())
-    print(ClueProcessor.validate_clue("0 1"))
-    print(ClueProcessor.format_clue("0 1"))
-    ClueProcessor.update_clue("test", "0 1")
-    print(ClueProcessor.get_clues())
-    print(ClueProcessor.get_detail())
-
-    # import subprocess
-    # import re
-    # from datetime import date
-    # from sys import platform
-    # import os
-
-    # script_dir = os.path.dirname(os.path.abspath(__file__))
-    # exe_dir = os.path.join(script_dir, "exchange")
-
-    # def exchange():
-    #     if platform == "linux" or platform == "linux2":
-    #         subprocess.run(["./utils/exchange/main"], cwd=exe_dir)
-    #     elif platform == "win32":
-    #         subprocess.run(["./utils/exchange/main.exe"], cwd=exe_dir)
-
-    # exchange()
