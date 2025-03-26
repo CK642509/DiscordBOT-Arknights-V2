@@ -8,6 +8,8 @@ from config import Configs
 from utils.crud_clues import ClueProcessor
 
 
+CHANNEL_HISTORY_LIMIT = 20
+
 logger = logging.getLogger("discord")
 
 
@@ -39,7 +41,22 @@ class ClueCog(commands.Cog):
     @commands.hybrid_command()
     async def update(self, ctx: commands.Context):
         """根據歷史訊息更新線索紀錄"""
-        pass
+        clue_channel = self.bot.get_channel(self.clue_channel_id)
+        messages = [
+            msg async for msg in clue_channel.history(limit=CHANNEL_HISTORY_LIMIT)
+        ]
+
+        for message in messages:
+            message_date = message.created_at
+            if (discord.utils.utcnow() - message_date).days > 1:
+                continue
+            ClueProcessor.handle_clue_message(message.author.id, message.content)
+
+        # return the updated detail
+        # await self.detail(ctx)
+        detail = ClueProcessor.get_detail()
+        info_channel = self.bot.get_channel(self.info_channel_id)
+        await info_channel.send(f"```{detail}```")
 
     # Although using Literal as user's type hint is much more readable, it's not flexible.
     # For example, if we want to get the usernames from the config file, we can't use Literal.
