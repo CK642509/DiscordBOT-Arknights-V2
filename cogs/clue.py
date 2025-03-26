@@ -46,14 +46,23 @@ class ClueCog(commands.Cog):
             msg async for msg in clue_channel.history(limit=CHANNEL_HISTORY_LIMIT)
         ]
 
+        latest_messages: dict[int, discord.Message] = {}
         for message in messages:
             message_date = message.created_at
+            # only listen to message that is created within 1 day
             if (discord.utils.utcnow() - message_date).days > 1:
                 continue
+
+            # only listen to the latest message from each user
+            if message.author.id not in latest_messages:
+                latest_messages[message.author.id] = message
+            elif message_date > latest_messages[message.author.id].created_at:
+                latest_messages[message.author.id] = message
+
+        for message in latest_messages.values():
             ClueProcessor.handle_clue_message(message.author.id, message.content)
 
         # return the updated detail
-        # await self.detail(ctx)
         detail = ClueProcessor.get_detail()
         info_channel = self.bot.get_channel(self.info_channel_id)
         await info_channel.send(f"```{detail}```")
