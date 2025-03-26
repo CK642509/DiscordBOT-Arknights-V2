@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from discord import app_commands, Interaction
+from discord import app_commands, ButtonStyle, Interaction, ui
 from discord.ext import commands
 from time import time
 
@@ -42,9 +42,35 @@ class ExchangeCog(commands.Cog):
             await interaction.response.send_message("計算正在進行中，請稍後再試！")
             return
 
+        everyone_updated = ClueProcessor.check_update_date()
+        if not everyone_updated:
+            view = ui.View()
+            btn = ui.Button(label="交換線索", style=ButtonStyle.primary)
+            btn.callback = self.on_start
+            cancel_btn = ui.Button(label="取消")
+            cancel_btn.callback = self.on_cancel
+
+            view.add_item(btn)
+            view.add_item(cancel_btn)
+            await interaction.response.send_message(
+                "有人的線索尚未更新，確認要開始交換嗎?", view=view
+            )
+            return
+
+        await self.start_exchange(interaction, defer=True)
+
+    async def on_cancel(self, interaction: Interaction):
+        await interaction.response.edit_message(content="已取消交換", view=None)
+
+    async def on_start(self, interaction: Interaction):
+        await interaction.response.edit_message(content="確認開始交換", view=None)
+        await self.start_exchange(interaction)
+
+    async def start_exchange(self, interaction: Interaction, defer: bool = False):
         logger.info("Exchange command received.")
         self.is_calculating = True
-        await interaction.response.defer()
+        if defer:
+            await interaction.response.defer()
         # await interaction.followup.send("開始計算！")
         start_time = time()
 

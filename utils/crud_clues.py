@@ -128,8 +128,22 @@ class ClueProcessor:
             return ""
 
     @staticmethod
-    def exchange():
+    def exchange() -> None:
+        """執行計算"""
         if platform == "linux" or platform == "linux2":
             subprocess.run(["./utils/exchange/main"], cwd=ClueProcessor.exe_dir)
         elif platform == "win32":
             subprocess.run(["./utils/exchange/main.exe"], cwd=ClueProcessor.exe_dir)
+
+    @staticmethod
+    def check_update_date() -> bool:
+        """檢查更新日期"""
+        with open(ClueProcessor.detail_path, "r") as f:
+            lines = f.readlines()
+            today_str = str(date.today())
+            for line in lines:
+                if line.strip():  # Ensure the line is not empty
+                    line_date = line.split()[0]
+                    if line_date != today_str:
+                        return False
+            return True
