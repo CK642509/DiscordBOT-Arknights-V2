@@ -113,8 +113,10 @@ class ClueProcessor:
     @staticmethod
     def validate_clue(clue: str) -> bool:
         """驗證線索格式"""
-        # check if only contains 0-7
-        return bool(re.match("/[^0-7]/", clue))
+        # the clue should be formatted first
+        clue = clue.strip()
+        pattern = r"^[0-7]+( [0-7]+)?$"
+        return bool(re.match(pattern, clue)) and len(clue.split()) <= 2
 
     @staticmethod
     def format_clue(clue: str) -> str:
