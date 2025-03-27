@@ -120,6 +120,7 @@ class ClueProcessor:
 
     @staticmethod
     def format_clue(clue: str) -> str:
+        """格式化線索"""
         clue = clue.strip()
         result = re.split("\s+", clue)
         if len(result) == 1:
