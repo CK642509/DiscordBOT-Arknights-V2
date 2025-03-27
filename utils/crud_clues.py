@@ -74,6 +74,11 @@ class ClueProcessor:
             except IndexError as e:
                 print(e)
 
+        # check if the author is one of the users
+        if str(author_id) not in ClueProcessor.users:
+            print("User not found in config")
+            return
+
         if author_id == 525463925194489876:  # 更新線索 (小蔡)
             handle_multiple_clue_message(content)
         else:
