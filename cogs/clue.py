@@ -53,6 +53,10 @@ class ClueCog(commands.Cog):
             if (discord.utils.utcnow() - message_date).days > 1:
                 continue
 
+            # only listen to message that is not from the bot
+            if message.author == self.bot.user:
+                continue
+
             # only listen to the latest message from each user
             if message.author.id not in latest_messages:
                 latest_messages[message.author.id] = message
