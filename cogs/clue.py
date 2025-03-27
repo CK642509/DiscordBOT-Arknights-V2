@@ -77,6 +77,9 @@ class ClueCog(commands.Cog):
         """幫指定玩家更新線索"""
         # update clue
         formatted_clue = ClueProcessor.format_clue(clue)
+        if not ClueProcessor.validate_clue(formatted_clue):
+            await interaction.response.send_message("請輸入有效的線索格式")
+            return
         ClueProcessor.update_clue(user.name, formatted_clue)
 
         # send the updated detail to the info channel
@@ -94,6 +97,7 @@ class ClueCog(commands.Cog):
         # if message.channel.id == self.info_channel_id:
         #     return
 
+        # TODO: validate clue format
         # update clue if the message is from the clue channel
         if message.channel.id == self.clue_channel_id:
             ClueProcessor.handle_clue_message(message.author.id, message.content)
