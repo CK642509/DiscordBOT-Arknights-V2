@@ -3,6 +3,7 @@ import re
 import subprocess
 from datetime import date
 from sys import platform
+from typing import Generator
 
 from config import Configs
 
@@ -136,12 +137,43 @@ class ClueProcessor:
             return ""
 
     @staticmethod
-    def exchange() -> None:
+    def exchange() -> Generator[str, None, None]:
         """執行計算"""
-        if platform == "linux" or platform == "linux2":
-            subprocess.run(["./utils/exchange/main"], cwd=ClueProcessor.exe_dir)
-        elif platform == "win32":
-            subprocess.run(["./utils/exchange/main.exe"], cwd=ClueProcessor.exe_dir)
+        try:
+            if platform == "linux" or platform == "linux2":
+                process = subprocess.Popen(
+                    ["./utils/exchange/main"],
+                    cwd=ClueProcessor.exe_dir,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+            elif platform == "win32":
+                process = subprocess.Popen(
+                    ["./utils/exchange/main.exe"],
+                    cwd=ClueProcessor.exe_dir,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+
+            # Yield stdout line by line
+            for line in iter(process.stdout.readline, ""):
+                yield line.strip()
+
+            # Wait for the process to complete
+            process.wait()
+
+            # Check for errors
+            if process.returncode != 0:
+                error_output = process.stderr.read()
+                raise subprocess.CalledProcessError(
+                    process.returncode, process.args, output=error_output
+                )
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error occurred while running the process: {e}")
+            yield e.output or "An error occurred."
 
     @staticmethod
     def check_update_date() -> bool:

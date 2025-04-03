@@ -71,12 +71,19 @@ class ExchangeCog(commands.Cog):
         self.is_calculating = True
         if defer:
             await interaction.response.defer()
-        # await interaction.followup.send("開始計算！")
+        initial_message = await interaction.followup.send("開始計算！", wait=True)
         start_time = time()
 
         async with interaction.channel.typing():
             loop = asyncio.get_running_loop()
-            await loop.run_in_executor(None, ClueProcessor.exchange)
+            generator = await loop.run_in_executor(None, ClueProcessor.exchange)
+
+            # Process the yielded strings
+            for output_line in generator:
+                if output_line.startswith("已計算"):
+                    await interaction.followup.edit_message(
+                        initial_message.id, content=output_line
+                    )
 
         end_time = time()
         elapsed_time = end_time - start_time
@@ -84,7 +91,9 @@ class ExchangeCog(commands.Cog):
             f"Exchange command completed. Time elapsed: {elapsed_time:.2f} seconds."
         )
         self.is_calculating = False
-        await interaction.followup.send("計算完成！")
+        await interaction.followup.edit_message(
+            initial_message.id, content="計算完成！"
+        )
 
 
 async def setup(bot: commands.Bot):
