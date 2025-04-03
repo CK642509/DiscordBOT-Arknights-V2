@@ -66,6 +66,11 @@ class ExchangeCog(commands.Cog):
         await interaction.response.edit_message(content="確認開始交換", view=None)
         await self.start_exchange(interaction)
 
+        # get the result and send it to the info channel
+        result = ClueProcessor.get_result()
+        info_channel = self.bot.get_channel(self.info_channel_id)
+        await info_channel.send(result)
+
     async def start_exchange(self, interaction: Interaction, defer: bool = False):
         logger.info("Exchange command received.")
         self.is_calculating = True
