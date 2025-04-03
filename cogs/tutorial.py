@@ -19,8 +19,10 @@ class TutorialCog(commands.Cog):
             title="使用教學",
             url="https://ithelp.ithome.com.tw/users/20162280/ironman/7781",
         )
-        embed.add_field(name="tutorial", value="查看使用教學", inline=False)
-        embed.add_field(name="exchange", value="開始計算最佳做法", inline=False)
+        embed.add_field(name="/tutorial", value="查看使用教學", inline=False)
+        embed.add_field(name="/exchange", value="開始計算最佳做法", inline=False)
+        embed.add_field(name="/result", value="查看最佳做法", inline=False)
+        embed.add_field(name="/update", value="根據歷史訊息更新線索紀錄", inline=False)
         await ctx.send(embed=embed)
 
 
