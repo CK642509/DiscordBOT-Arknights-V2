@@ -113,6 +113,7 @@ class ClueCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        """編輯訊息時更新線索"""
         if before.author == self.bot.user:
             return
 
@@ -134,6 +135,7 @@ class ClueCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
+        """刪除訊息時更新線索"""
         if message.author == self.bot.user:
             return
 
