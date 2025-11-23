@@ -18,7 +18,6 @@ RUN apt-get update \
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-RUN rm -f utils/exchange/main.exe
 COPY --from=builder /build/main utils/exchange/main
 RUN chmod +x utils/exchange/main
 ENTRYPOINT ["tini", "--"]
