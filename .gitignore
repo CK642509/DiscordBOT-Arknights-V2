@@ -2,3 +2,5 @@
 .env
 __pycache__
 config.toml
+_error_log.txt
+results.txt
