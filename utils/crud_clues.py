@@ -140,22 +140,23 @@ class ClueProcessor:
     def exchange() -> Generator[str, None, None]:
         """執行計算"""
         try:
-            if platform == "linux" or platform == "linux2":
-                process = subprocess.Popen(
-                    ["./utils/exchange/main"],
-                    cwd=ClueProcessor.exe_dir,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True
-                )
+            if platform.startswith("linux"):
+                binary_path = os.path.join(ClueProcessor.exe_dir, "main")
             elif platform == "win32":
-                process = subprocess.Popen(
-                    ["./utils/exchange/main.exe"],
-                    cwd=ClueProcessor.exe_dir,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    text=True
-                )
+                binary_path = os.path.join(ClueProcessor.exe_dir, "main.exe")
+            else:
+                raise RuntimeError(f"Unsupported platform: {platform}")
+
+            # Binary emits Big5/CP950 text, so decode with matching codec to avoid UnicodeDecodeError.
+            process = subprocess.Popen(
+                [binary_path],
+                cwd=ClueProcessor.exe_dir,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                encoding="cp950",
+                errors="replace",
+            )
 
             # Yield stdout line by line
             for line in iter(process.stdout.readline, ""):

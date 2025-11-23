@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*.swp
+.git
+.gitignore
+.vscode
+.idea
+.env
+config.toml
+utils/exchange/main.exe
