@@ -63,7 +63,7 @@ pip install -r requirements.txt
    - `id`：Discord 成員的「使用者 ID」
    - `name`：顯示的玩家名稱
 
-### 3. 啟用
+### 3. 啟動
 ```
 python main.py
 ```
@@ -72,12 +72,12 @@ python main.py
 
 Multi-stage Dockerfile 會在建置階段於 Linux 環境自動編譯 `utils/exchange/main`，因此容器中無須放置 `main.exe`。
 
-1. 建立映像檔
+1. 建立 Docker image
    ```bash
    docker build -t arknights-bot:0.1.0 .
    ```
+
 2. 啟動容器（以 volume 方式掛載含機敏資訊的設定檔）
    ```bash
    docker run --rm -v path/to/config.toml:/app/config.toml:ro --name arknights-bot arknights-bot:0.1.0
    ```
-   - 其他需要掛載的資料（例如 `utils/exchange` 內的輸入檔案）也可以用相同方式掛載。
