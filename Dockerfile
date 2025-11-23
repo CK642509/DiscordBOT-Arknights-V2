@@ -19,6 +19,9 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 COPY --from=builder /build/main utils/exchange/main
-RUN chmod +x utils/exchange/main
+RUN chmod +x utils/exchange/main \
+    && adduser --disabled-password --gecos '' --uid 1000 appuser \
+    && chown -R appuser:appuser /app
+USER appuser
 ENTRYPOINT ["tini", "--"]
 CMD ["python", "main.py"]
