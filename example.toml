@@ -8,12 +8,32 @@ token = ""
 
 [[users]]
 id = ""
-name = ""
+name = "Player1"
 
 [[users]]
 id = ""
-name = ""
+name = "Player2"
 
 [[users]]
 id = ""
-name = ""
+name = "Player3"
+
+[[users]]
+id = ""
+name = "Player4"
+
+[[users]]
+id = ""
+name = "Player5"
+
+[[users]]
+id = ""
+name = "Player6"
+
+[[users]]
+id = ""
+name = "Player7"
+
+[[users]]
+id = ""
+name = "Player8"
