@@ -67,3 +67,18 @@ pip install -r requirements.txt
 ```
 python main.py
 ```
+
+## Docker 執行方式
+
+Multi-stage Dockerfile 會在建置階段於 Linux 環境自動編譯 `utils/exchange/main`，因此容器中無須放置 `main.exe`。
+
+1. 建立映像檔
+   ```bash
+   docker build -t arknights-bot:0.1.0 .
+   ```
+2. 啟動容器（以 volume 方式掛載含機敏資訊的設定檔）
+   ```bash
+   docker run --rm -v config.toml:/app/config.toml:ro -v .env:/app/.env:ro --name arknights-bot arknights-bot:0.1.0
+   ```
+   - 如果專案未使用 `.env`，可移除對應的 `-v` 參數。
+   - 其他需要掛載的資料（例如 `utils/exchange` 內的輸入檔案）也可以用相同方式掛載。
