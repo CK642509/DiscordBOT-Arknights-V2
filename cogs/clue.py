@@ -116,7 +116,14 @@ class ClueCog(commands.Cog):
         # TODO: validate clue format
         # update clue if the message is from the clue channel
         if message.channel.id == self.clue_channel_id:
-            ClueProcessor.handle_clue_message(message.author.id, message.content)
+            try:
+                ClueProcessor.handle_clue_message(message.author.id, message.content)
+            except ValueError as e:
+                await message.channel.send(str(e))
+                return
+            except KeyError:
+                await message.channel.send(f"{message.author.mention} 你不在玩家名單中，無法更新線索")
+                return
 
             # send the updated detail to the info channel
             detail = ClueProcessor.get_detail()
@@ -138,7 +145,14 @@ class ClueCog(commands.Cog):
             return
 
         # set the clue to the new content
-        ClueProcessor.handle_clue_message(before.author.id, after.content)
+        try:
+            ClueProcessor.handle_clue_message(before.author.id, after.content)
+        except ValueError as e:
+            await before.channel.send(str(e))
+            return
+        except KeyError:
+            await before.channel.send(f"{before.author.mention} 你不在玩家名單中，無法更新線索")
+            return
 
         # send the updated detail to the info channel
         detail = ClueProcessor.get_detail()
@@ -160,7 +174,12 @@ class ClueCog(commands.Cog):
             return
 
         # reset the clue to "0 0"
-        ClueProcessor.handle_clue_message(message.author.id, "0 0")
+        try:
+            ClueProcessor.handle_clue_message(message.author.id, "0 0")
+        except KeyError:
+            return
+        except ValueError:
+            return
 
         # send the updated detail to the info channel
         detail = ClueProcessor.get_detail()

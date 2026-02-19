@@ -64,6 +64,8 @@ class ClueProcessor:
                 ClueProcessor.update_clue(user_name, formatted_clue)
             except KeyError:
                 print("User not found in config")
+            except ValueError as e:
+                raise ValueError(str(e))
 
         def handle_multiple_clue_message(content: str) -> None:
             try:
@@ -78,7 +80,7 @@ class ClueProcessor:
         # check if the author is one of the users
         if str(author_id) not in ClueProcessor.users:
             print("User not found in config")
-            return
+            raise KeyError("User not found in config")
 
         if author_id == 525463925194489876:  # 更新線索 (小蔡)
             handle_multiple_clue_message(content)
