@@ -81,3 +81,17 @@ Multi-stage Dockerfile 會在建置階段於 Linux 環境自動編譯 `utils/exc
    ```bash
    docker run --rm -v path/to/config.toml:/app/config.toml:ro --name arknights-bot arknights-bot:0.1.0
    ```
+
+## 測試線索交換演算法
+
+1. 建立 Docker image
+   ```
+   docker build -f Dockerfile.exchange -t exchange-main-test .
+   ```
+
+2. 啟動容器
+   ```
+   docker run --rm -it --entrypoint /bin/bash exchange-main-test
+   ./main
+   ```
+   
