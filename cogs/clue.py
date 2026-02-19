@@ -98,6 +98,14 @@ class ClueCog(commands.Cog):
         if message.author == self.bot.user:
             return
 
+        if message.content == "exchange" and (
+            message.channel.id == self.clue_channel_id
+            or message.channel.id == self.info_channel_id
+        ):
+            # ask user to use /exchange command to trigger the exchange process
+            await message.channel.send("請使用 /exchange 指令來觸發交換過程")
+            return
+
         # if message.channel.id == self.info_channel_id:
         #     return
 
