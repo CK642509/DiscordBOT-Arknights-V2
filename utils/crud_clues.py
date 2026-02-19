@@ -25,13 +25,13 @@ class ClueProcessor:
     users = {user.id: user.name for user in configs.users}
 
     @staticmethod
-    def get_users() -> str:
+    def get_users() -> list[str]:
         """取得所有人的名單"""
         with open(
             ClueProcessor.user_data_path, "r", errors="replace", encoding="cp950"
         ) as f:
             text = f.read()
-            return "\n".join(text.split("\n")[2:])
+            return text.split("\n")[2:]
 
     @staticmethod
     def get_clues() -> str:
@@ -64,6 +64,8 @@ class ClueProcessor:
                 ClueProcessor.update_clue(user_name, formatted_clue)
             except KeyError:
                 print("User not found in config")
+            except ValueError as e:
+                raise ValueError(str(e))
 
         def handle_multiple_clue_message(content: str) -> None:
             try:
@@ -78,7 +80,7 @@ class ClueProcessor:
         # check if the author is one of the users
         if str(author_id) not in ClueProcessor.users:
             print("User not found in config")
-            return
+            raise KeyError("User not found in config")
 
         if author_id == 525463925194489876:  # 更新線索 (小蔡)
             handle_multiple_clue_message(content)
@@ -93,11 +95,14 @@ class ClueProcessor:
         clue_list = text.split("\n")[:8]
 
         # get user list (lowercase)
-        user_list = ClueProcessor.get_users().split("\n")
+        user_list = ClueProcessor.get_users()
         user_list = list(map(lambda x: x.lower(), user_list))
 
         # get the row number that needs to be updated
-        idx = user_list.index(user_name.strip().lower())
+        try:
+            idx = user_list.index(user_name.strip().lower())
+        except ValueError:
+            raise ValueError(f"玩家 '{user_name}' 不在名單中，無法更新線索")
 
         # set new clues
         new_clue = clue.strip()
@@ -128,7 +133,7 @@ class ClueProcessor:
     def format_clue(clue: str) -> str:
         """格式化線索"""
         clue = clue.strip()
-        result = re.split("\s+", clue)
+        result = clue.split()
         if len(result) == 1:
             return f"{clue} 0"
         elif len(result) == 2:

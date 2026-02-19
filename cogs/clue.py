@@ -73,7 +73,7 @@ class ClueCog(commands.Cog):
 
     # Although using Literal as user's type hint is much more readable, it's not flexible.
     # For example, if we want to get the usernames from the config file, we can't use Literal.
-    @app_commands.command(name="更新線索")
+    @app_commands.command()
     @app_commands.choices(user=[Choice(name=user, value=user) for user in usernames])
     async def set_clue(
         self, interaction: discord.Interaction, user: Choice[str], clue: str
@@ -84,7 +84,11 @@ class ClueCog(commands.Cog):
         if not ClueProcessor.validate_clue(formatted_clue):
             await interaction.response.send_message("請輸入有效的線索格式")
             return
-        ClueProcessor.update_clue(user.name, formatted_clue)
+        try:
+            ClueProcessor.update_clue(user.name, formatted_clue)
+        except ValueError as e:
+            await interaction.response.send_message(str(e))
+            return
 
         # send the updated detail to the info channel
         detail = ClueProcessor.get_detail()
@@ -98,13 +102,28 @@ class ClueCog(commands.Cog):
         if message.author == self.bot.user:
             return
 
+        if message.content == "exchange" and (
+            message.channel.id == self.clue_channel_id
+            or message.channel.id == self.info_channel_id
+        ):
+            # ask user to use /exchange command to trigger the exchange process
+            await message.channel.send("請使用 /exchange 指令來觸發交換過程")
+            return
+
         # if message.channel.id == self.info_channel_id:
         #     return
 
         # TODO: validate clue format
         # update clue if the message is from the clue channel
         if message.channel.id == self.clue_channel_id:
-            ClueProcessor.handle_clue_message(message.author.id, message.content)
+            try:
+                ClueProcessor.handle_clue_message(message.author.id, message.content)
+            except ValueError as e:
+                await message.channel.send(str(e))
+                return
+            except KeyError:
+                await message.channel.send(f"{message.author.mention} 你不在玩家名單中，無法更新線索")
+                return
 
             # send the updated detail to the info channel
             detail = ClueProcessor.get_detail()
@@ -126,7 +145,14 @@ class ClueCog(commands.Cog):
             return
 
         # set the clue to the new content
-        ClueProcessor.handle_clue_message(before.author.id, after.content)
+        try:
+            ClueProcessor.handle_clue_message(before.author.id, after.content)
+        except ValueError as e:
+            await before.channel.send(str(e))
+            return
+        except KeyError:
+            await before.channel.send(f"{before.author.mention} 你不在玩家名單中，無法更新線索")
+            return
 
         # send the updated detail to the info channel
         detail = ClueProcessor.get_detail()
@@ -148,7 +174,12 @@ class ClueCog(commands.Cog):
             return
 
         # reset the clue to "0 0"
-        ClueProcessor.handle_clue_message(message.author.id, "0 0")
+        try:
+            ClueProcessor.handle_clue_message(message.author.id, "0 0")
+        except KeyError:
+            return
+        except ValueError:
+            return
 
         # send the updated detail to the info channel
         detail = ClueProcessor.get_detail()

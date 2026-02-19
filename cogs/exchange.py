@@ -32,8 +32,9 @@ class ExchangeCog(commands.Cog):
             return
 
         result = ClueProcessor.get_result()
-        info_channel = self.bot.get_channel(self.info_channel_id)
-        await info_channel.send(result)
+        clue_channel = self.bot.get_channel(self.clue_channel_id)
+        await clue_channel.send(result)
+        await ctx.send(f"已將最佳做法發送到 {clue_channel.mention}！", ephemeral=True)
 
     @app_commands.command()
     async def exchange(self, interaction: Interaction):
@@ -66,10 +67,10 @@ class ExchangeCog(commands.Cog):
         await interaction.response.edit_message(content="確認開始交換", view=None)
         await self.start_exchange(interaction)
 
-        # get the result and send it to the info channel
+        # get the result and send it to the clue channel
         result = ClueProcessor.get_result()
-        info_channel = self.bot.get_channel(self.info_channel_id)
-        await info_channel.send(result)
+        clue_channel = self.bot.get_channel(self.clue_channel_id)
+        await clue_channel.send(result)
 
     async def start_exchange(self, interaction: Interaction, defer: bool = False):
         logger.info("Exchange command received.")

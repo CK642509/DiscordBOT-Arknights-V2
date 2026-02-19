@@ -23,6 +23,7 @@ class TutorialCog(commands.Cog):
         embed.add_field(name="/exchange", value="開始計算最佳做法", inline=False)
         embed.add_field(name="/result", value="查看最佳做法", inline=False)
         embed.add_field(name="/update", value="根據歷史訊息更新線索紀錄", inline=False)
+        embed.add_field(name="/set_clue", value="幫指定玩家更新線索", inline=False)
         await ctx.send(embed=embed)
 
 
