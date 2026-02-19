@@ -73,7 +73,7 @@ class ClueCog(commands.Cog):
 
     # Although using Literal as user's type hint is much more readable, it's not flexible.
     # For example, if we want to get the usernames from the config file, we can't use Literal.
-    @app_commands.command(name="更新線索")
+    @app_commands.command()
     @app_commands.choices(user=[Choice(name=user, value=user) for user in usernames])
     async def set_clue(
         self, interaction: discord.Interaction, user: Choice[str], clue: str
@@ -84,7 +84,11 @@ class ClueCog(commands.Cog):
         if not ClueProcessor.validate_clue(formatted_clue):
             await interaction.response.send_message("請輸入有效的線索格式")
             return
-        ClueProcessor.update_clue(user.name, formatted_clue)
+        try:
+            ClueProcessor.update_clue(user.name, formatted_clue)
+        except ValueError as e:
+            await interaction.response.send_message(str(e))
+            return
 
         # send the updated detail to the info channel
         detail = ClueProcessor.get_detail()

@@ -97,7 +97,10 @@ class ClueProcessor:
         user_list = list(map(lambda x: x.lower(), user_list))
 
         # get the row number that needs to be updated
-        idx = user_list.index(user_name.strip().lower())
+        try:
+            idx = user_list.index(user_name.strip().lower())
+        except ValueError:
+            raise ValueError(f"玩家 '{user_name}' 不在名單中，無法更新線索")
 
         # set new clues
         new_clue = clue.strip()
@@ -128,7 +131,7 @@ class ClueProcessor:
     def format_clue(clue: str) -> str:
         """格式化線索"""
         clue = clue.strip()
-        result = re.split("\s+", clue)
+        result = clue.split()
         if len(result) == 1:
             return f"{clue} 0"
         elif len(result) == 2:
