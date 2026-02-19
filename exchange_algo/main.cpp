@@ -9,6 +9,7 @@ void P_want();
 void P_want_tmp(),FP_want_tmp();
 void TRY();
 void log(int ,int ,int , int );
+int find_conf_idx(int , int );
 
 char F_DATA2[30]="./_comb_data.txt";
 char F_DATA[30]="./_user_data.txt";
@@ -30,25 +31,25 @@ int Comb6[266][7];
 int Comb7[1855][8];
 
 int store[10][8],want[10][8],tmp_want[10][8],limit[10],signal;
-int valid_spot[100][2],num_valid;	//	 [n][0] = ª±®a½s¸¹	[n][[1] = ½u¯Á½s¸¹  
-int record[100];	// = 0 ²Ä¤@¦¸¨Ó ; = 1 °h¦^¨Óªº ; = 2 ²Ä¤G¦¸°h¦^¨Ó 
-int tmp_solu[100];	// = 0 ¨º¤@®æ¤£¿ï ; = 1 ¨º¤@®æ¿ïwant 
+int valid_spot[100][2],num_valid;	//	 [n][0] = ï¿½ï¿½ï¿½aï¿½sï¿½ï¿½	[n][[1] = ï¿½uï¿½ï¿½ï¿½sï¿½ï¿½  
+int record[100];	// = 0 ï¿½Ä¤@ï¿½ï¿½ï¿½ï¿½ ; = 1 ï¿½hï¿½^ï¿½Óªï¿½ ; = 2 ï¿½Ä¤Gï¿½ï¿½ï¿½hï¿½^ï¿½ï¿½ 
+int tmp_solu[100];	// = 0 ï¿½ï¿½ï¿½@ï¿½æ¤£ï¿½ï¿½ ; = 1 ï¿½ï¿½ï¿½@ï¿½ï¿½ï¿½want 
 int num_solu;
 int pct[11];
 
-int conf[100][3],num_conf;	//	[0] = §ë²¼  [1][2] ¬O ª±®a1µ¹ª±®a2  
-int tmp_how[8][10];	//	7­Ó¼Æ¦r ³Ì¦h9­Óª±®a  tmp_how[][0] ¬O¦s¥L¬O´X¤è 
+int conf[100][3],num_conf;	//	[0] = ï¿½ë²¼  [1][2] ï¿½O ï¿½ï¿½ï¿½a1ï¿½ï¿½ï¿½ï¿½ï¿½a2  
+int tmp_how[8][10];	//	7ï¿½Ó¼Æ¦r ï¿½Ì¦h9ï¿½Óªï¿½ï¿½a  tmp_how[][0] ï¿½Oï¿½sï¿½Lï¿½Oï¿½Xï¿½ï¿½ 
 int tmp_vote[100],tmp_chg[1000][3],tmp_num_chg;	
 int tmp_rank[6]; 
 int tmp_3[3],tmp_4[10],tmp_5[45],tmp_6[266],tmp_7[1855];
-int B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg;	//	conf:¬ö¿ý½Öµ¹½Ö 
+int B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg;	//	conf:ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ 
 
 int main()
 {
 
-	printf("¡i¤è¦à½u¯Á¥æ´«¾¹ ver 1.2¡j\n\n");
+	printf("ï¿½iï¿½ï¿½ï¿½uï¿½ï¿½ï¿½æ´«ï¿½ï¿½ ver 1.2ï¿½j\n\n");
 	
-	printf("Åª¨ú°ò¥»¸ê®Æ¸ê®Æ...\n\n");
+	printf("Åªï¿½ï¿½ï¿½ò¥»¸ï¿½Æ¸ï¿½ï¿½...\n\n");
 	
 	data2 = fopen(F_DATA2,"r");
 	for(i=1;i<=2;i++)for(j=1;j<=3;j++)fscanf(data2,"%d",&Comb3[i][j]);
@@ -57,7 +58,7 @@ int main()
 	for(i=1;i<=265;i++)for(j=1;j<=6;j++)fscanf(data2,"%d",&Comb6[i][j]);
 	for(i=1;i<=1854;i++)for(j=1;j<=7;j++)fscanf(data2,"%d",&Comb7[i][j]);
 
-	printf("Åª¨úª±®a¸ê®Æ...\n\n");
+	printf("Åªï¿½ï¿½ï¿½ï¿½ï¿½aï¿½ï¿½ï¿½...\n\n");
 	
 	data = fopen(F_DATA,"r");
 	IP = fopen(F_IP,"r");
@@ -67,11 +68,11 @@ int main()
 	fscanf(data,"%d",&num_player);
 	fscanf(data,"%s",&goaway);
 	for(i=1;i<=num_player;i++)fscanf(data,"%s",&name[i]);
-	printf("½u¯Á¥æ´«¤H¼Æ¡G%d¤H\n",num_player);
-	for(i=1;i<=num_player;i++)printf("%d¸¹ %s\n",i,name[i]);
+	printf("ï¿½uï¿½ï¿½ï¿½æ´«ï¿½Hï¿½Æ¡G%dï¿½H\n",num_player);
+	for(i=1;i<=num_player;i++)printf("%dï¿½ï¿½ %s\n",i,name[i]);
 	printf("\n\n");
 	
-	//printf("½Ð¨M©w­n¤â°Ê¿é¤J¼Æ¾Ú ©Î Åª¨ú¸ê®Æ (1 = ¤â°Ê; 1¥H¥~ªº¼Æ¦r = Åª¨ú)¡G");
+	//printf("ï¿½Ð¨Mï¿½wï¿½nï¿½ï¿½Ê¿ï¿½Jï¿½Æ¾ï¿½ ï¿½ï¿½ Åªï¿½ï¿½ï¿½ï¿½ï¿½ (1 = ï¿½ï¿½ï¿½; 1ï¿½Hï¿½~ï¿½ï¿½ï¿½Æ¦r = Åªï¿½ï¿½)ï¿½G");
 	//scanf("%d",&Alice);
 	Alice = 2;
 	
@@ -81,20 +82,20 @@ int main()
 		conf[num_conf][1]=i;
 		conf[num_conf][2]=j;
 	}
-	printf("²Õ¦X¼Æ = %d\n",num_conf);
-	B_rank[1]=100;	//	¥ý³]³Ì¤j 
+	printf("ï¿½Õ¦Xï¿½ï¿½ = %d\n",num_conf);
+	B_rank[1]=100;	//	ï¿½ï¿½ï¿½]ï¿½Ì¤j 
 	
-	if(Alice==1)	//	¤â°Ê¿é¤J 
+	if(Alice==1)	//	ï¿½ï¿½Ê¿ï¿½J 
 	{
 		for(i=1;i<=num_player;i++)
 		{
-			printf("½Ð¿é¤J %d ¸¹ª±®a %s ¾Ö¦³ªº½u¯Á¡G",i,name[i]);
+			printf("ï¿½Ð¿ï¿½J %d ï¿½ï¿½ï¿½ï¿½ï¿½a %s ï¿½Ö¦ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½G",i,name[i]);
 			scanf("%s",&goaway);
 			j=0;
 			
 			for(j=0;goaway[j]!='\0';j++)store[i][ goaway[j]-48 ] ++ ;
 			
-			printf("½Ð¿é¤J %d ¸¹ª±®a %s ·Q´«ªº½u¯Á¡G\n(¨S«ü©w¥´0¡A¦³«ü©w¥æ´«¼Æªº¸Ü¦b«e­±¥[¤W¹ïÀ³¼Æ¥Øªº$¦r¸¹)",i,name[i]);
+			printf("ï¿½Ð¿ï¿½J %d ï¿½ï¿½ï¿½ï¿½ï¿½a %s ï¿½Qï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½G\n(ï¿½Sï¿½ï¿½ï¿½wï¿½ï¿½0ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½wï¿½æ´«ï¿½Æªï¿½ï¿½Ü¦bï¿½eï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½Æ¥Øªï¿½$ï¿½rï¿½ï¿½)",i,name[i]);
 			scanf("%s",&goaway);
 			for(j=0;goaway[j]!='\0';j++)
 			{
@@ -107,7 +108,7 @@ int main()
 		}
 	}
 		
-	else	//	Åª¨ú 
+	else	//	Åªï¿½ï¿½ 
 	{
 		for(i=1;i<=num_player;i++)
 		{
@@ -118,7 +119,7 @@ int main()
 				store[i][ goaway[j]-48 ] ++ ;
 				printf("%d ",goaway[j]-48);
 			}
-			printf("%d ¸¹ª±®a %s ¾Ö¦³ªº½u¯Á¡G%s\n",i,name[i],goaway);
+			printf("%d ï¿½ï¿½ï¿½ï¿½ï¿½a %s ï¿½Ö¦ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½G%s\n",i,name[i],goaway);
 			
 			fscanf(IP,"%s",&goaway);
 			for(j=0;goaway[j]!='\0';j++)
@@ -126,45 +127,45 @@ int main()
 				if(goaway[j]=='$')limit[i]++;
 				else want[i][ goaway[j]-48 ] = 1;			
 			}
-			printf("%d ¸¹ª±®a %s ·Q´«ªº½u¯Á¡G%s\n",i,name[i],goaway);
+			printf("%d ï¿½ï¿½ï¿½ï¿½ï¿½a %s ï¿½Qï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½G%s\n",i,name[i],goaway);
 			printf("\n");
 		}		
 	}
 	
-	// ¼Ð°O¤£¥i¯à´«ªº¦¨ -1 
+	// ï¿½Ð°Oï¿½ï¿½ï¿½iï¿½à´«ï¿½ï¿½ï¿½ï¿½ -1 
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]!=1)if(store[j][i]==0)want[j][i]=-1;	
 	
 	
-	printf("\n*********¯S®í­n¨D*********\n\n");
+	printf("\n*********ï¿½Sï¿½ï¿½ï¿½nï¿½D*********\n\n");
 	for(i=1;i<=num_player;i++)
 	{
-		if(limit[i]!=0)printf("%d ¸¹ª±®a¥u·Q´« %d±i ½u¯Á\n",i,limit[i]);
-		else limit[i]=10; // ¨S¦³­­¨îªº¤H³]¬°³Ì¤j­È 
+		if(limit[i]!=0)printf("%d ï¿½ï¿½ï¿½ï¿½ï¿½aï¿½uï¿½Qï¿½ï¿½ %dï¿½i ï¿½uï¿½ï¿½\n",i,limit[i]);
+		else limit[i]=10; // ï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½îªºï¿½Hï¿½]ï¿½ï¿½ï¿½Ì¤jï¿½ï¿½ 
 	}
 		
-	printf("\n**************************\n­Y¥H¤W¸ê°TµL»~");
+	printf("\n**************************\nï¿½Yï¿½Hï¿½Wï¿½ï¿½Tï¿½Lï¿½~");
 	//system("PAUSE"); 
 	
-	///	ÀË¬d¦³¨S¦³¤H¦Û¤v¨S¦³½u¯Áµw­n´« 
+	///	ï¿½Ë¬dï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Hï¿½Û¤vï¿½Sï¿½ï¿½ï¿½uï¿½ï¿½ï¿½wï¿½nï¿½ï¿½ 
 	
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]==1)if(store[j][i]==0)
 	{
-		printf("\n%s ªº %d ¸¹½u¯Á¦Û¤v¨S¦³¡A¤£¯à¸ò§O¤H´«QAQ!!! \n\n",name[j],i);
+		printf("\n%s ï¿½ï¿½ %d ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½Û¤vï¿½Sï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Hï¿½ï¿½QAQ!!! \n\n",name[j],i);
 		want[j][i]=-1;
 		//system("PAUSE"); 
 	}
 	 
 	
 	
-	///	ÀË¬d¦³¨S¦³¤£¥i¥H´«ªº ¦³ªº¸Ü¶K¥X¿ù»~°T®§ ///
+	///	ï¿½Ë¬dï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½ï¿½ï¿½iï¿½Hï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ü¶Kï¿½Xï¿½ï¿½ï¿½~ï¿½Tï¿½ï¿½ ///
 	
-	printf("\n>> (1) ÀË¬d¦³¨S¦³¤H½u¯Á´«¤£±¼¡B¦³¨S¦³½u¯Á¥u¦³¤@¤H¦³\n");	
+	printf("\n>> (1) ï¿½Ë¬dï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½Hï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½Sï¿½ï¿½ï¿½uï¿½ï¿½ï¿½uï¿½ï¿½ï¿½@ï¿½Hï¿½ï¿½\n");	
 	for(i=1;i<=7;i++)
 	{
 		Alice = 0;
 		for(j=1;j<=num_player;j++)if(want[j][i]==1)Alice++;
-		if(Alice==0)continue;	// ³o­Ó¸¹½X¨S¤H­n´«  
-		else					// ¦³¤H­n´« 
+		if(Alice==0)continue;	// ï¿½oï¿½Ó¸ï¿½ï¿½Xï¿½Sï¿½Hï¿½nï¿½ï¿½  
+		else					// ï¿½ï¿½ï¿½Hï¿½nï¿½ï¿½ 
 		{
 			Alice = 0;
 			for(j=1;j<=num_player;j++)if(want[j][i]!=-1)
@@ -174,11 +175,11 @@ int main()
 			}
 			if(Alice<=1)
 			{
-				printf("\n%s ªº %d ¸¹½u¯Á ¨S¤H¸ò¥L´«QAQ!!! \n\n",name[Sig],i);
-				for(j=1;j<=num_player;j++)want[j][i]=-1;	//	³o­Ó½s¸¹ªº½u¯Á³£¥i¥H¥ð®§¤F 
+				printf("\n%s ï¿½ï¿½ %d ï¿½ï¿½ï¿½uï¿½ï¿½ ï¿½Sï¿½Hï¿½ï¿½Lï¿½ï¿½QAQ!!! \n\n",name[Sig],i);
+				for(j=1;j<=num_player;j++)want[j][i]=-1;	//	ï¿½oï¿½Ó½sï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½iï¿½Hï¿½ð®§¤F 
 				//system("PAUSE"); 
 			}
-			else;	// ½T©w³o­Ó¸¹½X¶W¹L¤@­Ó¤H¥H¤W¾Ö¦³ 
+			else;	// ï¿½Tï¿½wï¿½oï¿½Ó¸ï¿½ï¿½Xï¿½Wï¿½Lï¿½@ï¿½Ó¤Hï¿½Hï¿½Wï¿½Ö¦ï¿½ 
 		}
 	}
 	
@@ -186,23 +187,23 @@ int main()
 	{
 		Alice = 0;
 		for(j=1;j<=num_player;j++)if(store[j][i]!=0)Alice++;
-		if(Alice<=1)for(j=1;j<=num_player;j++)want[j][i]=-1; //	¦pªG¥u¦³¤@­Ó¤H¦³ ³o­Ó½s¸¹ªº½u¯Á¥i¥H¥ð®§¤F 
+		if(Alice<=1)for(j=1;j<=num_player;j++)want[j][i]=-1; //	ï¿½pï¿½Gï¿½uï¿½ï¿½ï¿½@ï¿½Ó¤Hï¿½ï¿½ ï¿½oï¿½Ó½sï¿½ï¿½ï¿½ï¿½ï¿½uï¿½ï¿½ï¿½iï¿½Hï¿½ð®§¤F 
 	}
 	 
 	
-	printf("\n>> (1) §¹¦¨\n");
+	printf("\n>> (1) ï¿½ï¿½ï¿½ï¿½\n");
 		
-	printf("\n>> (2) ¬Y¤Hªº¬Y¸¹½u¯Á¤j©óµ¥©ó3­Ó¡AÅý¥L¤]´«¨º­Ó¸¹½X\n");
+	printf("\n>> (2) ï¿½Yï¿½Hï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½uï¿½ï¿½ï¿½jï¿½óµ¥©ï¿½3ï¿½Ó¡Aï¿½ï¿½ï¿½Lï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½ï¿½X\n");
 	
 	for(i=1;i<=7;i++)for(j=1;j<=num_player;j++)if(store[j][i]>=3)if(want[j][i]!=-1)want[j][i]=1;
 
-	printf("\n>> (2) §¹¦¨\n");
+	printf("\n>> (2) ï¿½ï¿½ï¿½ï¿½\n");
 	
-	printf("\n>> (3) ÀË¬d­pºâ¼Æ¶q¬O§_¹L©óÃe¤j\n");
+	printf("\n>> (3) ï¿½Ë¬dï¿½pï¿½ï¿½Æ¶qï¿½Oï¿½_ï¿½Lï¿½ï¿½ï¿½eï¿½j\n");
 	
-	//if(0)for(j=1;j<=num_player;j++)printf("ª±®a%d ¹w­p­n´«%d­Ó\n",j,player_state[j]);
+	//if(0)for(j=1;j<=num_player;j++)printf("ï¿½ï¿½ï¿½a%d ï¿½wï¿½pï¿½nï¿½ï¿½%dï¿½ï¿½\n",j,player_state[j]);
 
-	//	¥ý¼Æ¦n¦³´X­Ó¥i°ÊÂI 
+	//	ï¿½ï¿½ï¿½Æ¦nï¿½ï¿½ï¿½Xï¿½Ó¥iï¿½ï¿½ï¿½I 
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]==0)
 	{
 		num_valid++;
@@ -213,20 +214,20 @@ int main()
 	printf("\nnum_valid = %d\n",num_valid);
 	
 	MAX = pow(2,num_valid);
-	printf("\n¹Á¸Õ²Õ¦XÁ`¼Æ = %d\n",MAX);
+	printf("\nï¿½ï¿½ï¿½Õ²Õ¦Xï¿½`ï¿½ï¿½ = %d\n",MAX);
 	for(i=1;i<=9;i++)pct[i] = MAX/10*i;
 	
 	//for(i=1;i<=num_valid;i++)printf("(%d , %d)\n",valid_spot[i][0],valid_spot[i][1]);
  
 	if(num_valid>=23)
 	{
-		printf("\n¡i²Õ¦X¼Æ¹L¦h¡AÀ³¹Á¸ÕÀu¤Æ¡j\n");
+		printf("\nï¿½iï¿½Õ¦Xï¿½Æ¹Lï¿½hï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uï¿½Æ¡j\n");
 		
-		printf("\n>> (3-1) ¬Y¤Hªº¬Y¸¹½u¯Á¤j©óµ¥©ó2­Ó¡AÅý¥L¤]´«¨º­Ó¸¹½X\n");
+		printf("\n>> (3-1) ï¿½Yï¿½Hï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½uï¿½ï¿½ï¿½jï¿½óµ¥©ï¿½2ï¿½Ó¡Aï¿½ï¿½ï¿½Lï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½ï¿½X\n");
 	
 		for(i=1;i<=7;i++)for(j=1;j<=num_player;j++)if(store[j][i]>=2)if(want[j][i]!=-1)want[j][i]=1;
 		
-		printf("\n>> (3-1) §¹¦¨\n");
+		printf("\n>> (3-1) ï¿½ï¿½ï¿½ï¿½\n");
 			
 		num_valid = 0;
 		
@@ -240,55 +241,55 @@ int main()
 		printf("\nnum_valid = %d\n",num_valid);
 		
 		MAX = pow(2,num_valid);
-		printf("\n¹Á¸Õ²Õ¦XÁ`¼Æ = %d\n",MAX);
+		printf("\nï¿½ï¿½ï¿½Õ²Õ¦Xï¿½`ï¿½ï¿½ = %d\n",MAX);
 		for(i=1;i<=9;i++)pct[i] = MAX/10*i;		
 	}
 			
  	if(num_valid>=31)
 	{
-		printf("\n\nÄµ§i¡G·¸¦ìÃz¬µ¤F!!!\n\n±j¨îµ²§ôµ{¦¡¹Bºâ!!!\n\n");
+		printf("\n\nÄµï¿½iï¿½Gï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½ï¿½F!!!\n\nï¿½jï¿½îµ²ï¿½ï¿½ï¿½{ï¿½ï¿½ï¿½Bï¿½ï¿½!!!\n\n");
 		goto END;
 	}
  	
- 	printf("\n>> (4) ¶}©l­pºâ©Ò¦³¥i¯à©Ê\n");
+ 	printf("\n>> (4) ï¿½}ï¿½lï¿½pï¿½ï¿½Ò¦ï¿½ï¿½iï¿½ï¿½ï¿½\n");
  
-	if(num_valid>=20)if(num_valid<=22)printf("\n½Ðµyµ¥¤@¤U (¬ù1¤ÀÄÁ¤º§¹¦¨)......\n\n");
- 	if(num_valid>=23)if(num_valid<=25)printf("\n¥i¯à·|¶]¦³ÂI¤[ (¬ù1¤ÀÄÁ¥H¤W¡B10¤ÀÄÁ¥H¤U)......\n\n");
- 	if(num_valid>=26)if(num_valid<=30)printf("\n¥i¯à·|¶]¶W¯Å¤[ (»·¶W¹L10¤ÀÄÁ)......\n\n");
+	if(num_valid>=20)if(num_valid<=22)printf("\nï¿½Ðµyï¿½ï¿½ï¿½@ï¿½U (ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)......\n\n");
+ 	if(num_valid>=23)if(num_valid<=25)printf("\nï¿½iï¿½ï¿½|ï¿½]ï¿½ï¿½ï¿½Iï¿½[ (ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Hï¿½Wï¿½B10ï¿½ï¿½ï¿½ï¿½ï¿½Hï¿½U)......\n\n");
+ 	if(num_valid>=26)if(num_valid<=30)printf("\nï¿½iï¿½ï¿½|ï¿½]ï¿½Wï¿½Å¤[ (ï¿½ï¿½ï¿½Wï¿½L10ï¿½ï¿½ï¿½ï¿½)......\n\n");
  
- 	//	¥ý§â tmp_want ½T©w
+ 	//	ï¿½ï¿½ï¿½ï¿½ tmp_want ï¿½Tï¿½w
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)tmp_want[j][i]=want[j][i];
 	
-	//printf("¨«°g®c´ú¸Õ¶}©l!!!!!\n");
+	//printf("ï¿½ï¿½ï¿½gï¿½cï¿½ï¿½ï¿½Õ¶}ï¿½l!!!!!\n");
 
-	printf("¤w­pºâ 0%%......\n");	
+	printf("ï¿½wï¿½pï¿½ï¿½ 0%%......\n");	
 	Alice = 1;	
 	while(Alice!=0)
 	{
 		if(Alice <= num_valid)
 		{
-			if(record[ Alice ]==0)	//	(²Ä¤@¦¸¨Ó) 
+			if(record[ Alice ]==0)	//	(ï¿½Ä¤@ï¿½ï¿½ï¿½ï¿½) 
 			{
-				record[Alice]++;	//	¬ö¿ý¸Õ¹L¤F = 1
+				record[Alice]++;	//	ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹Lï¿½F = 1
 				tmp_solu[Alice] = -1;
-				Alice++;	//	©¹¤U¤@­Ó 
+				Alice++;	//	ï¿½ï¿½ï¿½Uï¿½@ï¿½ï¿½ 
 				
 			}
-			else if(record[ Alice ]==1)	// («á­±°h¦^¨Óªº) 
+			else if(record[ Alice ]==1)	// (ï¿½á­±ï¿½hï¿½^ï¿½Óªï¿½) 
 			{
-				record[Alice]++;	//	¬ö¿ý¸Õ¹L²Ä¤G¦¸¤F  = 2
+				record[Alice]++;	//	ï¿½ï¿½ï¿½ï¿½ï¿½Õ¹Lï¿½Ä¤Gï¿½ï¿½ï¿½F  = 2
 				tmp_solu[Alice] = 1;
 				Alice++;			
 			}
-			else	// (²Ä¤G¦¸°h¦^¨Ó) 
+			else	// (ï¿½Ä¤Gï¿½ï¿½ï¿½hï¿½^ï¿½ï¿½) 
 			{
-				record[Alice]=0;	//	³£¸Õ§¹¤F = 0 
+				record[Alice]=0;	//	ï¿½ï¿½ï¿½Õ§ï¿½ï¿½F = 0 
 				Alice--;
 			}
 
 		}
 		
-		else	//	¨ì©³¼h 
+		else	//	ï¿½ì©³ï¿½h 
 		{
 			num_solu++;
 			for(i=1;i<=num_valid;i++)tmp_want[ valid_spot[i][0] ][ valid_spot[i][1]] = tmp_solu[i];
@@ -298,21 +299,21 @@ int main()
 		
 		for(i=1;i<=9;i++)if(num_solu==pct[i])
 		{
-			printf("¤w­pºâ %d0%%......\n",i);
+			printf("ï¿½wï¿½pï¿½ï¿½ %d0%%......\n",i);
 			pct[i]--;
 		}
 	}
-	printf("¤w­pºâ 100%%......\n");
+	printf("ï¿½wï¿½pï¿½ï¿½ 100%%......\n");
 
 
-	printf("\n>> (4) §¹¦¨\n");
+	printf("\n>> (4) ï¿½ï¿½ï¿½ï¿½\n");
 		
-	//	¿é¥X³Ì¨Îµ²ªG
+	//	ï¿½ï¿½Xï¿½Ì¨Îµï¿½ï¿½G
 	
-	//	¬ö¿ý B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
+	//	ï¿½ï¿½ï¿½ï¿½ B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
 	
-	printf("³Ì¨Îµ²ªG°Ñ¼Æ¡G(%d,%d,%d,%d,%d)\n",B_rank[1],B_rank[2],B_rank[3],B_rank[4],B_rank[5]);
-	printf("\n¸¹½X\t");
+	printf("ï¿½Ì¨Îµï¿½ï¿½Gï¿½Ñ¼Æ¡G(%d,%d,%d,%d,%d)\n",B_rank[1],B_rank[2],B_rank[3],B_rank[4],B_rank[5]);
+	printf("\nï¿½ï¿½ï¿½X\t");
 	for(j=1;j<=7;j++)printf("%d\t",j);	
 	printf("\n");
 	printf("--------------------------------------------------------------\n");
@@ -330,7 +331,7 @@ int main()
 	printf("\n");
 	
 	
-	printf("§I´«¤èªk¡G\n");
+	printf("ï¿½Iï¿½ï¿½ï¿½ï¿½kï¿½G\n");
 	for(j=1;j<=num_player;j++)
 	{
 		for(i=1;i<=num_player;i++)
@@ -342,8 +343,8 @@ int main()
 				{
 					if(Alice==0)
 					{
-						printf("%s\t ¡÷\t %s\t",name[j],name[i]);
-						fprintf(RS,"%s\t ¡÷\t %s\t",name[j],name[i]);	
+						printf("%s\t ï¿½ï¿½\t %s\t",name[j],name[i]);
+						fprintf(RS,"%s\t ï¿½ï¿½\t %s\t",name[j],name[i]);	
 					}
 					Alice++;
 					printf("%d",Best_chg[k][0]);
@@ -363,7 +364,7 @@ int main()
 	if(B_rank[1]>=num_player)
 	{
 		END:
-		printf("\n\n\n¥æ´«¥¢±Ñ......½Ð¬¢§Þ³N·á³B²z¡I¡I¡I\n\n\n");
+		printf("\n\n\nï¿½æ´«ï¿½ï¿½ï¿½ï¿½......ï¿½Ð¬ï¿½ï¿½Þ³Nï¿½ï¿½Bï¿½zï¿½Iï¿½Iï¿½I\n\n\n");
 	}
 		
 	
@@ -380,9 +381,9 @@ int main()
 void P_want_tmp()
 {
 	int i,j;
-	printf("\n¸¹½X\t");
+	printf("\nï¿½ï¿½ï¿½X\t");
 	for(j=1;j<=7;j++)printf("%d\t",j);	
-	printf("\n¡i»Ý¨Dª¬ªp¡j\n");
+	printf("\nï¿½iï¿½Ý¨Dï¿½ï¿½ï¿½pï¿½j\n");
 	printf("--------------------------------------------------------------\n");
 	for(i=1;i<=num_player;i++)
 	{
@@ -401,9 +402,9 @@ void P_want_tmp()
 void FP_want_tmp()
 {
 	int i,j;
-	fprintf(OP,"\n¸¹½X\t");
+	fprintf(OP,"\nï¿½ï¿½ï¿½X\t");
 	for(j=1;j<=7;j++)fprintf(OP,"%d\t",j);	
-	fprintf(OP,"\n¡i»Ý¨Dª¬ªp¡j\n");
+	fprintf(OP,"\nï¿½iï¿½Ý¨Dï¿½ï¿½ï¿½pï¿½j\n");
 	fprintf(OP,"--------------------------------------------------------------\n");
 	for(i=1;i<=num_player;i++)
 	{
@@ -422,8 +423,9 @@ void FP_want_tmp()
 void TRY()
 {
 	int i,j,k,a,b,c,Alice,BEST;	
+	int cnt,shift,pos,score,best_shift,best_score,from,to;
 	
-	//RANK:	1:P0¤Ö  2:P1¤Ö  3:P6¤Ö  4:½bÀY¤Ö  5:¼Æ¦r¥Î¤Ö 
+	//RANK:	1:P0ï¿½ï¿½  2:P1ï¿½ï¿½  3:P6ï¿½ï¿½  4:ï¿½bï¿½Yï¿½ï¿½  5:ï¿½Æ¦rï¿½Î¤ï¿½ 
 	
 	for(i=1;i<=7;i++)for(j=0;j<=num_player;j++)tmp_how[i][j]=0;
 	for(k=1;k<=num_conf;k++)tmp_vote[k]=0;
@@ -432,7 +434,7 @@ void TRY()
 
 	fprintf(OP,"NO. %d\t",num_solu);
 	
-	//	ÀË¬d¬O§_¯à´« 
+	//	ï¿½Ë¬dï¿½Oï¿½_ï¿½à´« 
 	for(i=1;i<=7;i++)	
 	{
 		for(j=1;j<=num_player;j++)if(tmp_want[j][i]==1)
@@ -441,17 +443,17 @@ void TRY()
 			tmp_how[i][ tmp_how[i][0] ] = j;
 		}
 		
-		if(tmp_how[i][0] ==1)	//	¤£¯à¦³¸¹½X¥u¦³¤@¤H¦³ 
+		if(tmp_how[i][0] ==1)	//	ï¿½ï¿½ï¿½à¦³ï¿½ï¿½ï¿½Xï¿½uï¿½ï¿½ï¿½@ï¿½Hï¿½ï¿½ 
 		{
 			fprintf(OP,">>ERROR ANS!!!\n");
 			return;
 		}
 
-		if (tmp_how[i][0] > 0)tmp_rank[5]+=tmp_how[i][0];	//	­pºâ¥Î¤F´X­Ó¼Æ¦r 
+		if (tmp_how[i][0] > 0)tmp_rank[5]+=tmp_how[i][0];	//	ï¿½pï¿½ï¿½Î¤Fï¿½Xï¿½Ó¼Æ¦r 
 	}
 	if(0)FP_want_tmp();
 	
-	//	­pºâ¨C­Ó¤Hªáªº½u¯Á 
+	//	ï¿½pï¿½ï¿½Cï¿½Ó¤Hï¿½áªºï¿½uï¿½ï¿½ 
 	
 	for(j=1;j<=num_player;j++)
 	{
@@ -469,9 +471,9 @@ void TRY()
 	
 	tmp_num_chg=0;
 	
-	//	­pºâ¥Î¤F´X­Ó½bÀY  num_conf, conf[i][1], conf[i][2]    
+	//	ï¿½pï¿½ï¿½Î¤Fï¿½Xï¿½Ó½bï¿½Y  num_conf, conf[i][1], conf[i][2]    
 	
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==2) // ¥ýºâ2  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==2) // ï¿½ï¿½ï¿½ï¿½2  
 	{
 		for(k=1;k<=num_conf;k++)
 		{
@@ -480,7 +482,7 @@ void TRY()
 		}
 	}
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==3) // ºâ3  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==3) // ï¿½ï¿½3  
 	{
 		for(n=1;n<=2;n++)tmp_3[n]=0;	
 		for(n=1;n<=2;n++)
@@ -490,7 +492,7 @@ void TRY()
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb3[n][3] ])tmp_3[n]+=tmp_vote[k];
 		}
 
-		Alice = -1;	//	¸Õ¸Õ¬Ý³Ì¨Î§ë²¼¬O½Ö  
+		Alice = -1;	//	ï¿½Õ¸Õ¬Ý³Ì¨Î§ë²¼ï¿½Oï¿½ï¿½  
 		for(n=1;n<=2;n++)if(tmp_3[n]>Alice)
 		{
 			BEST = n;
@@ -506,7 +508,7 @@ void TRY()
 	
 	}
 	
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==4) // ºâ4  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==4) // ï¿½ï¿½4  
 	{
 		for(n=1;n<=9;n++)tmp_4[n]=0;
 		for(n=1;n<=9;n++)
@@ -533,7 +535,7 @@ void TRY()
 		}	
 	}	
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==5) // ºâ5  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==5) // ï¿½ï¿½5  
 	{
 		for(n=1;n<=44;n++)tmp_5[n]=0;
 		for(n=1;n<=44;n++)
@@ -562,7 +564,7 @@ void TRY()
 		}	
 	}
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==6) // ºâ6  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==6) // ï¿½ï¿½6  
 	{
 		for(n=1;n<=265;n++)tmp_6[n]=0;
 		for(n=1;n<=265;n++)
@@ -593,7 +595,7 @@ void TRY()
 		}	
 	}	
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==7) // ºâ7  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==7) // ï¿½ï¿½7  
 	{
 		for(n=1;n<=1854;n++)tmp_7[n]=0;
 		for(n=1;n<=1854;n++)
@@ -626,13 +628,45 @@ void TRY()
 		}	
 	}
 
+	for(i=1;i<=7;i++)if(tmp_how[i][0]>=8) // ï¿½ï¿½8ï¿½Hï¿½Hï¿½W (fallback)
+	{
+		cnt = tmp_how[i][0];
+		best_shift = 1;
+		best_score = -1;
+
+		for(shift=1;shift<=cnt-1;shift++)
+		{
+			score = 0;
+			for(pos=1;pos<=cnt;pos++)
+			{
+				from = tmp_how[i][pos];
+				to = tmp_how[i][ ((pos+shift-1)%cnt)+1 ];
+				k = find_conf_idx(from,to);
+				if(k>0)score += tmp_vote[k];
+			}
+			if(score>best_score)
+			{
+				best_score = score;
+				best_shift = shift;
+			}
+		}
+
+		for(pos=1;pos<=cnt;pos++)
+		{
+			from = tmp_how[i][pos];
+			to = tmp_how[i][ ((pos+best_shift-1)%cnt)+1 ];
+			k = find_conf_idx(from,to);
+			if(k>0)log(k,i,from,to);
+		}
+	}
+
 
 	
-	for(k=1;k<=num_conf;k++)if(tmp_vote[k]>0)tmp_rank[4]++;		//	½bÀY¨Ï¥Î¼Æ¶q 
+	for(k=1;k<=num_conf;k++)if(tmp_vote[k]>0)tmp_rank[4]++;		//	ï¿½bï¿½Yï¿½Ï¥Î¼Æ¶q 
 	
 	fprintf(OP,"(%d,%d,%d,%d,%d)\n",tmp_rank[1],tmp_rank[2],tmp_rank[3],tmp_rank[4],tmp_rank[5]);
 	
-	//	¬ö¿ý B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
+	//	ï¿½ï¿½ï¿½ï¿½ B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
 	
 	for(i=1;i<=5;i++)
 	{
@@ -663,6 +697,13 @@ void log(int k,int a,int b, int c)
 	tmp_chg[tmp_num_chg][0] = a;
 	tmp_chg[tmp_num_chg][1] = b;
 	tmp_chg[tmp_num_chg][2] = c;
+}
+
+int find_conf_idx(int from, int to)
+{
+	int idx;
+	for(idx=1;idx<=num_conf;idx++)if(conf[idx][1]==from)if(conf[idx][2]==to)return idx;
+	return 0;
 }
 
 
