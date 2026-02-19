@@ -25,13 +25,13 @@ class ClueProcessor:
     users = {user.id: user.name for user in configs.users}
 
     @staticmethod
-    def get_users() -> str:
+    def get_users() -> list[str]:
         """取得所有人的名單"""
         with open(
             ClueProcessor.user_data_path, "r", errors="replace", encoding="cp950"
         ) as f:
             text = f.read()
-            return "\n".join(text.split("\n")[2:])
+            return text.split("\n")[2:]
 
     @staticmethod
     def get_clues() -> str:
@@ -93,7 +93,7 @@ class ClueProcessor:
         clue_list = text.split("\n")[:8]
 
         # get user list (lowercase)
-        user_list = ClueProcessor.get_users().split("\n")
+        user_list = ClueProcessor.get_users()
         user_list = list(map(lambda x: x.lower(), user_list))
 
         # get the row number that needs to be updated
