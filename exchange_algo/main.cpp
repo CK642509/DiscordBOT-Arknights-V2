@@ -31,26 +31,26 @@ int Comb6[266][7];
 int Comb7[1855][8];
 
 int store[10][8],want[10][8],tmp_want[10][8],limit[10],signal;
-int valid_spot[100][2],num_valid;	//	 [n][0] = ���a�s��	[n][[1] = �u���s��  
-int record[100];	// = 0 �Ĥ@���� ; = 1 �h�^�Ӫ� ; = 2 �ĤG���h�^�� 
-int tmp_solu[100];	// = 0 ���@�椣�� ; = 1 ���@���want 
+int valid_spot[100][2],num_valid; 	// 	 [n][0] = 玩家編號	[n][[1] = 線索編號  
+int record[100]; 	// = 0 第一次來 ; = 1 退回來的 ; = 2 第二次退回來 
+int tmp_solu[100]; 	// = 0 那一格不選 ; = 1 那一格選want 
 int num_solu;
 int pct[11];
 
-int conf[100][3],num_conf;	//	[0] = �벼  [1][2] �O ���a1�����a2  
-int tmp_how[8][10];	//	7�ӼƦr �̦h9�Ӫ��a  tmp_how[][0] �O�s�L�O�X�� 
-int tmp_vote[100],tmp_chg[1000][3],tmp_num_chg;	
+int conf[100][3],num_conf; 	// 	[0] = 投票  [1][2] 是 玩家1給玩家2  
+int tmp_how[8][10]; 	// 	7個數字 最多9個玩家  tmp_how[][0] 是存他是幾方 
+int tmp_vote[100],tmp_chg[1000][3],tmp_num_chg; 	
 int tmp_rank[6]; 
 int tmp_3[3],tmp_4[10],tmp_5[45],tmp_6[266],tmp_7[1855];
-int B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg;	//	conf:�����ֵ��� 
+int B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg; 	// 	conf:紀錄誰給誰 
 
 int main()
 {
 
-	printf("�i���u���洫�� ver 1.2�j\n\n");
-	
-	printf("Ū���򥻸�Ƹ��...\n\n");
-	
+	printf("【方舟線索交換器 ver 1.2】\n\n");
+    
+	printf("讀取基本資料資料...\n\n");
+    
 	data2 = fopen(F_DATA2,"r");
 	for(i=1;i<=2;i++)for(j=1;j<=3;j++)fscanf(data2,"%d",&Comb3[i][j]);
 	for(i=1;i<=9;i++)for(j=1;j<=4;j++)fscanf(data2,"%d",&Comb4[i][j]);
@@ -58,8 +58,8 @@ int main()
 	for(i=1;i<=265;i++)for(j=1;j<=6;j++)fscanf(data2,"%d",&Comb6[i][j]);
 	for(i=1;i<=1854;i++)for(j=1;j<=7;j++)fscanf(data2,"%d",&Comb7[i][j]);
 
-	printf("Ū�����a���...\n\n");
-	
+	printf("讀取玩家資料...\n\n");
+    
 	data = fopen(F_DATA,"r");
 	IP = fopen(F_IP,"r");
 	OP = fopen(F_OP,"w");
@@ -68,104 +68,96 @@ int main()
 	fscanf(data,"%d",&num_player);
 	fscanf(data,"%s",&goaway);
 	for(i=1;i<=num_player;i++)fscanf(data,"%s",&name[i]);
-	printf("�u���洫�H�ơG%d�H\n",num_player);
-	for(i=1;i<=num_player;i++)printf("%d�� %s\n",i,name[i]);
+	printf("線索交換人數：%d人\n",num_player);
+	for(i=1;i<=num_player;i++)printf("%d號 %s\n",i,name[i]);
 	printf("\n\n");
-	
-	//printf("�ШM�w�n��ʿ�J�ƾ� �� Ū����� (1 = ���; 1�H�~���Ʀr = Ū��)�G");
-	//scanf("%d",&Alice);
+    
+	// printf("請決定要手動輸入數據 或 讀取資料 (1 = 手動; 1以外的數字 = 讀取)：");
+	// scanf("%d",&Alice);
 	Alice = 2;
-	
+    
 	for(i=1;i<=num_player;i++)for(j=1;j<=num_player;j++)if(i!=j)
 	{
 		num_conf++;
 		conf[num_conf][1]=i;
 		conf[num_conf][2]=j;
 	}
-	printf("�զX�� = %d\n",num_conf);
-	B_rank[1]=100;	//	���]�̤j 
-	
-	if(Alice==1)	//	��ʿ�J 
+	printf("組合數 = %d\n",num_conf);
+	B_rank[1]=100; 	// 	先設最大 
+    
+	if(Alice==1)    
 	{
 		for(i=1;i<=num_player;i++)
 		{
-			printf("�п�J %d �����a %s �֦����u���G",i,name[i]);
+			printf("請輸入 %d 號玩家 %s 擁有的線索：",i,name[i]);
 			scanf("%s",&goaway);
 			j=0;
-			
+            
 			for(j=0;goaway[j]!='\0';j++)store[i][ goaway[j]-48 ] ++ ;
-			
-			printf("�п�J %d �����a %s �Q�����u���G\n(�S���w��0�A�����w�洫�ƪ��ܦb�e���[�W�����ƥت�$�r��)",i,name[i]);
+            
+			printf("請輸入 %d 號玩家 %s 想換的線索：\n(沒指定打0，有指定交換數的話在前面加上對應數目的$字號)",i,name[i]);
 			scanf("%s",&goaway);
 			for(j=0;goaway[j]!='\0';j++)
 			{
 				if(goaway[j]=='$')limit[i]++;
-				else want[i][ goaway[j]-48 ] = 1;			
+				else want[i][ goaway[j]-48 ] = 1;            
 			}
-			
-			
-			
 		}
 	}
-		
-	else	//	Ū�� 
+        
+	else	// 讀取    
 	{
 		for(i=1;i<=num_player;i++)
 		{
 			fscanf(IP,"%s",&goaway);
-			j=0;			
-			for(j=0;goaway[j]!='\0';j++)
-			{
-				store[i][ goaway[j]-48 ] ++ ;
-				printf("%d ",goaway[j]-48);
-			}
-			printf("%d �����a %s �֦����u���G%s\n",i,name[i],goaway);
-			
+			j=0;            
+			for(j=0;goaway[j]!='\0';j++)store[i][ goaway[j]-48 ] ++ ;
+			printf("%d 號玩家 %s 擁有的線索：%s\n",i,name[i],goaway);
+            
 			fscanf(IP,"%s",&goaway);
 			for(j=0;goaway[j]!='\0';j++)
 			{
 				if(goaway[j]=='$')limit[i]++;
-				else want[i][ goaway[j]-48 ] = 1;			
+				else want[i][ goaway[j]-48 ] = 1;            
 			}
-			printf("%d �����a %s �Q�����u���G%s\n",i,name[i],goaway);
+			printf("%d 號玩家 %s 想換的線索：%s\n",i,name[i],goaway);
 			printf("\n");
-		}		
+		}        
 	}
-	
-	// �аO���i�ഫ���� -1 
-	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]!=1)if(store[j][i]==0)want[j][i]=-1;	
-	
-	
-	printf("\n*********�S���n�D*********\n\n");
+    
+	// 標記不可能換的成 -1 
+	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]!=1)if(store[j][i]==0)want[j][i]=-1;    
+    
+    
+	printf("\n*********特殊要求*********\n\n");
 	for(i=1;i<=num_player;i++)
 	{
-		if(limit[i]!=0)printf("%d �����a�u�Q�� %d�i �u��\n",i,limit[i]);
-		else limit[i]=10; // �S������H�]���̤j�� 
+		if(limit[i]!=0)printf("%d 號玩家只想換 %d張 線索\n",i,limit[i]);
+		else limit[i]=10; // 沒有限制的人設為最大值 
 	}
-		
-	printf("\n**************************\n�Y�H�W��T�L�~");
-	//system("PAUSE"); 
-	
-	///	�ˬd���S���H�ۤv�S���u���w�n�� 
-	
+        
+	printf("\n**************************\n若以上資訊無誤");
+	// system("PAUSE"); 
+    
+	///    檢查有沒有人自己沒有線索硬要換 
+    
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]==1)if(store[j][i]==0)
 	{
-		printf("\n%s �� %d ���u���ۤv�S���A�����O�H��QAQ!!! \n\n",name[j],i);
+		printf("\n%s 的 %d 號線索自己沒有，不能跟別人換QAQ!!! \n\n",name[j],i);
 		want[j][i]=-1;
-		//system("PAUSE"); 
+		// system("PAUSE"); 
 	}
-	 
-	
-	
-	///	�ˬd���S�����i�H���� �����ܶK�X���~�T�� ///
-	
-	printf("\n>> (1) �ˬd���S���H�u���������B���S���u���u���@�H��\n");	
+     
+    
+	///    檢查有沒有不可以換的 有的話貼出錯誤訊息 ///
+    
+	printf("\n>> (1) 檢查有沒有人線索換不掉、有沒有線索只有一人有\n");    
 	for(i=1;i<=7;i++)
 	{
 		Alice = 0;
 		for(j=1;j<=num_player;j++)if(want[j][i]==1)Alice++;
-		if(Alice==0)continue;	// �o�Ӹ��X�S�H�n��  
-		else					// ���H�n�� 
+		if(Alice==0)continue;   // 這個號碼沒人要換  
+		else                    // 有人要換 
 		{
 			Alice = 0;
 			for(j=1;j<=num_player;j++)if(want[j][i]!=-1)
@@ -175,146 +167,146 @@ int main()
 			}
 			if(Alice<=1)
 			{
-				printf("\n%s �� %d ���u�� �S�H��L��QAQ!!! \n\n",name[Sig],i);
-				for(j=1;j<=num_player;j++)want[j][i]=-1;	//	�o�ӽs�����u�����i�H�𮧤F 
-				//system("PAUSE"); 
+				printf("\n%s 的 %d 號線索 沒人跟他換QAQ!!! \n\n",name[Sig],i);
+				for(j=1;j<=num_player;j++)want[j][i]=-1;    //    這個編號的線索都可以休息了 
+				// system("PAUSE"); 
 			}
-			else;	// �T�w�o�Ӹ��X�W�L�@�ӤH�H�W�֦� 
+			else;    // 確定這個號碼超過一個人以上擁有 
 		}
 	}
-	
+    
 	for(i=1;i<=7;i++)
 	{
 		Alice = 0;
 		for(j=1;j<=num_player;j++)if(store[j][i]!=0)Alice++;
-		if(Alice<=1)for(j=1;j<=num_player;j++)want[j][i]=-1; //	�p�G�u���@�ӤH�� �o�ӽs�����u���i�H�𮧤F 
+		if(Alice<=1)for(j=1;j<=num_player;j++)want[j][i]=-1; //    如果只有一個人有 這個編號的線索可以休息了 
 	}
-	 
-	
-	printf("\n>> (1) ����\n");
-		
-	printf("\n>> (2) �Y�H���Y���u���j�󵥩�3�ӡA���L�]�����Ӹ��X\n");
-	
+     
+    
+	printf("\n>> (1) 完成\n");
+        
+	printf("\n>> (2) 某人的某號線索大於等於3個，讓他也換那個號碼\n");
+    
 	for(i=1;i<=7;i++)for(j=1;j<=num_player;j++)if(store[j][i]>=3)if(want[j][i]!=-1)want[j][i]=1;
 
-	printf("\n>> (2) ����\n");
-	
-	printf("\n>> (3) �ˬd�p��ƶq�O�_�L���e�j\n");
-	
-	//if(0)for(j=1;j<=num_player;j++)printf("���a%d �w�p�n��%d��\n",j,player_state[j]);
+	printf("\n>> (2) 完成\n");
+    
+	printf("\n>> (3) 檢查計算數量是否過於龐大\n");
+    
+	//if(0)for(j=1;j<=num_player;j++)printf("玩家%d 預計要換%d個\n",j,player_state[j]);
 
-	//	���Ʀn���X�ӥi���I 
+	//    先數好有幾個可動點 
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]==0)
 	{
 		num_valid++;
 		valid_spot[num_valid][0]=j;
-		valid_spot[num_valid][1]=i;		
+		valid_spot[num_valid][1]=i;        
 	}
-	
+    
 	printf("\nnum_valid = %d\n",num_valid);
-	
+    
 	MAX = pow(2,num_valid);
-	printf("\n���ղզX�`�� = %d\n",MAX);
+	printf("\n嘗試組合總數 = %d\n",MAX);
 	for(i=1;i<=9;i++)pct[i] = MAX/10*i;
-	
+    
 	//for(i=1;i<=num_valid;i++)printf("(%d , %d)\n",valid_spot[i][0],valid_spot[i][1]);
  
 	if(num_valid>=23)
 	{
-		printf("\n�i�զX�ƹL�h�A�������u�ơj\n");
-		
-		printf("\n>> (3-1) �Y�H���Y���u���j�󵥩�2�ӡA���L�]�����Ӹ��X\n");
-	
+		printf("\n【組合數過多，應嘗試優化】\n");
+        
+		printf("\n>> (3-1) 某人的某號線索大於等於2個，讓他也換那個號碼\n");
+    
 		for(i=1;i<=7;i++)for(j=1;j<=num_player;j++)if(store[j][i]>=2)if(want[j][i]!=-1)want[j][i]=1;
-		
-		printf("\n>> (3-1) ����\n");
-			
+        
+		printf("\n>> (3-1) 完成\n");
+            
 		num_valid = 0;
-		
+        
 		for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)if(want[j][i]==0)
 		{
 			num_valid++;
 			valid_spot[num_valid][0]=j;
-			valid_spot[num_valid][1]=i;		
-		}	
-		
+			valid_spot[num_valid][1]=i;        
+		}    
+        
 		printf("\nnum_valid = %d\n",num_valid);
-		
+        
 		MAX = pow(2,num_valid);
-		printf("\n���ղզX�`�� = %d\n",MAX);
-		for(i=1;i<=9;i++)pct[i] = MAX/10*i;		
+		printf("\n嘗試組合總數 = %d\n",MAX);
+		for(i=1;i<=9;i++)pct[i] = MAX/10*i;        
 	}
-			
- 	if(num_valid>=31)
+            
+		if(num_valid>=31)
 	{
-		printf("\n\nĵ�i�G�����z���F!!!\n\n�j����{���B��!!!\n\n");
+		printf("\n\n警告：溢位爆炸了!!!\n\n強制結束程式運算!!!\n\n");
 		goto END;
 	}
- 	
- 	printf("\n>> (4) �}�l�p��Ҧ��i���\n");
+    	
+		printf("\n>> (4) 開始計算所有可能性\n");
  
-	if(num_valid>=20)if(num_valid<=22)printf("\n�еy���@�U (��1����������)......\n\n");
- 	if(num_valid>=23)if(num_valid<=25)printf("\n�i��|�]���I�[ (��1�����H�W�B10�����H�U)......\n\n");
- 	if(num_valid>=26)if(num_valid<=30)printf("\n�i��|�]�W�Ť[ (���W�L10����)......\n\n");
+	if(num_valid>=20)if(num_valid<=22)printf("\n請稍等一下 (約1分鐘內完成)......\n\n");
+	if(num_valid>=23)if(num_valid<=25)printf("\n可能會跑有點久 (約1分鐘以上、10分鐘以下)......\n\n");
+	if(num_valid>=26)if(num_valid<=30)printf("\n可能會跑超級久 (遠超過10分鐘)......\n\n");
  
- 	//	���� tmp_want �T�w
+	//    先把 tmp_want 確定
 	for(j=1;j<=num_player;j++)for(i=1;i<=7;i++)tmp_want[j][i]=want[j][i];
-	
-	//printf("���g�c���ն}�l!!!!!\n");
+    
+	//printf("走迷宮測試開始!!!!!\n");
 
-	printf("�w�p�� 0%%......\n");	
-	Alice = 1;	
+	printf("已計算 0%%......\n");    
+	Alice = 1;    
 	while(Alice!=0)
 	{
 		if(Alice <= num_valid)
 		{
-			if(record[ Alice ]==0)	//	(�Ĥ@����) 
+			if(record[ Alice ]==0)    //    (第一次來) 
 			{
-				record[Alice]++;	//	�����չL�F = 1
+				record[Alice]++;    //	紀錄試過了 = 1
 				tmp_solu[Alice] = -1;
-				Alice++;	//	���U�@�� 
-				
+				Alice++;    
+                
 			}
-			else if(record[ Alice ]==1)	// (�᭱�h�^�Ӫ�) 
+			else if(record[ Alice ]==1)    // (後面退回來的) 
 			{
-				record[Alice]++;	//	�����չL�ĤG���F  = 2
+				record[Alice]++;    //	紀錄試過第二次了  = 2
 				tmp_solu[Alice] = 1;
-				Alice++;			
+				Alice++;            
 			}
-			else	// (�ĤG���h�^��) 
+			else    // (第二次退回來) 
 			{
-				record[Alice]=0;	//	���է��F = 0 
+				record[Alice]=0;    //	都試完了 = 0
 				Alice--;
 			}
 
 		}
-		
-		else	//	�쩳�h 
+        
+		else    //    到底層 
 		{
 			num_solu++;
 			for(i=1;i<=num_valid;i++)tmp_want[ valid_spot[i][0] ][ valid_spot[i][1]] = tmp_solu[i];
 			TRY();
 			Alice --; 
 		}
-		
+        
 		for(i=1;i<=9;i++)if(num_solu==pct[i])
 		{
-			printf("�w�p�� %d0%%......\n",i);
+			printf("已計算 %d0%%......\n",i);
 			pct[i]--;
 		}
 	}
-	printf("�w�p�� 100%%......\n");
+	printf("已計算 100%%......\n");
 
 
-	printf("\n>> (4) ����\n");
-		
-	//	��X�̨ε��G
-	
-	//	���� B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
-	
-	printf("�̨ε��G�ѼơG(%d,%d,%d,%d,%d)\n",B_rank[1],B_rank[2],B_rank[3],B_rank[4],B_rank[5]);
-	printf("\n���X\t");
-	for(j=1;j<=7;j++)printf("%d\t",j);	
+	printf("\n>> (4) 完成\n");
+        
+	//    輸出最佳結果
+    
+	//    紀錄 B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
+    
+	printf("最佳結果參數：(%d,%d,%d,%d,%d)\n",B_rank[1],B_rank[2],B_rank[3],B_rank[4],B_rank[5]);
+	printf("\n號碼\t");
+	for(j=1;j<=7;j++)printf("%d\t",j);    
 	printf("\n");
 	printf("--------------------------------------------------------------\n");
 	for(i=1;i<=num_player;i++)
@@ -324,14 +316,14 @@ int main()
 		{
 			if(Best_want[i][j]==1)printf("O\t");
 			else if(Best_want[i][j]==0)printf(".\t");
-			else printf(" \t");				
+			else printf(" \t");                
 		}
 		printf("\n");
 	}
 	printf("\n");
-	
-	
-	printf("�I����k�G\n");
+    
+    
+	printf("兌換方法：\n");
 	for(j=1;j<=num_player;j++)
 	{
 		for(i=1;i<=num_player;i++)
@@ -343,8 +335,8 @@ int main()
 				{
 					if(Alice==0)
 					{
-						printf("%s\t ��\t %s\t",name[j],name[i]);
-						fprintf(RS,"%s\t ��\t %s\t",name[j],name[i]);	
+						printf("%s\t -->\t %s\t",name[j],name[i]);
+						fprintf(RS,"%s\t -->\t %s\t",name[j],name[i]);    
 					}
 					Alice++;
 					printf("%d",Best_chg[k][0]);
@@ -356,34 +348,34 @@ int main()
 				printf("\n");
 				fprintf(RS,"\n");
 			}
-		}		
+		}        
 		printf("--------------------------\n");
 		fprintf(RS,"--------------------------\n");
-	}	
-	
+	}    
+    
 	if(B_rank[1]>=num_player)
 	{
 		END:
-		printf("\n\n\n�洫����......�Ь��޳N��B�z�I�I�I\n\n\n");
+		printf("\n\n\n交換失敗......請洽技術猿處理！！！\n\n\n");
 	}
-		
-	
+        
+    
 	fclose(data);
-	fclose(IP);	
-	fclose(OP);	
+	fclose(IP);    
+	fclose(OP);    
 	fclose(RS);
-	
-	
-	//system("PAUSE");
+    
+    
+	// system("PAUSE");
 	return 0;
 }
 
 void P_want_tmp()
 {
 	int i,j;
-	printf("\n���X\t");
-	for(j=1;j<=7;j++)printf("%d\t",j);	
-	printf("\n�i�ݨD���p�j\n");
+	printf("\n號碼\t");
+	for(j=1;j<=7;j++)printf("%d\t",j);    
+	printf("\n【需求狀況】\n");
 	printf("--------------------------------------------------------------\n");
 	for(i=1;i<=num_player;i++)
 	{
@@ -392,19 +384,19 @@ void P_want_tmp()
 		{
 			if(tmp_want[i][j]==1)printf("O\t");
 			else if(tmp_want[i][j]==0)printf(".\t");
-			else printf(" \t");				
+			else printf(" \t");                
 		}
 		printf("\n");
 	}
-	printf("\n");		
+	printf("\n");        
 }
 
 void FP_want_tmp()
 {
 	int i,j;
-	fprintf(OP,"\n���X\t");
-	for(j=1;j<=7;j++)fprintf(OP,"%d\t",j);	
-	fprintf(OP,"\n�i�ݨD���p�j\n");
+	fprintf(OP,"\n號碼\t");
+	for(j=1;j<=7;j++)fprintf(OP,"%d\t",j);    
+	fprintf(OP,"\n【需求狀況】\n");
 	fprintf(OP,"--------------------------------------------------------------\n");
 	for(i=1;i<=num_player;i++)
 	{
@@ -413,48 +405,48 @@ void FP_want_tmp()
 		{
 			if(tmp_want[i][j]==1)fprintf(OP,"O\t");
 			else if(tmp_want[i][j]==0)fprintf(OP,".\t");
-			else fprintf(OP," \t");				
+			else fprintf(OP," \t");                
 		}
 		fprintf(OP,"\n");
 	}
-	fprintf(OP,"\n");		
+	fprintf(OP,"\n");        
 }
 
 void TRY()
 {
-	int i,j,k,a,b,c,Alice,BEST;	
+	int i,j,k,a,b,c,Alice,BEST;
 	int cnt,shift,pos,score,best_shift,best_score,from,to;
-	
-	//RANK:	1:P0��  2:P1��  3:P6��  4:�b�Y��  5:�Ʀr�Τ� 
-	
+    
+	//RANK:    1:P0少  2:P1少  3:P6少  4:箭頭少  5:數字用少 
+    
 	for(i=1;i<=7;i++)for(j=0;j<=num_player;j++)tmp_how[i][j]=0;
 	for(k=1;k<=num_conf;k++)tmp_vote[k]=0;
 	for(i=1;i<=5;i++)tmp_rank[i]=0;
 
 
 	fprintf(OP,"NO. %d\t",num_solu);
-	
-	//	�ˬd�O�_�ഫ 
-	for(i=1;i<=7;i++)	
+    
+	//    檢查是否能換 
+	for(i=1;i<=7;i++)    
 	{
 		for(j=1;j<=num_player;j++)if(tmp_want[j][i]==1)
 		{
-			tmp_how[i][0]++;	
+			tmp_how[i][0]++;    
 			tmp_how[i][ tmp_how[i][0] ] = j;
 		}
-		
-		if(tmp_how[i][0] ==1)	//	���঳���X�u���@�H�� 
+        
+		if(tmp_how[i][0] ==1)    //    不能有號碼只有一人有 
 		{
 			fprintf(OP,">>ERROR ANS!!!\n");
 			return;
 		}
 
-		if (tmp_how[i][0] > 0)tmp_rank[5]+=tmp_how[i][0];	//	�p��ΤF�X�ӼƦr 
+		if (tmp_how[i][0] > 0)tmp_rank[5]+=tmp_how[i][0];    //    計算用了幾個數字 
 	}
 	if(0)FP_want_tmp();
-	
-	//	�p��C�ӤH�᪺�u�� 
-	
+    
+	//    計算每個人花的線索 
+    
 	for(j=1;j<=num_player;j++)
 	{
 		Alice = 0;
@@ -468,12 +460,12 @@ void TRY()
 			return;
 		}
 	}
-	
+    
 	tmp_num_chg=0;
-	
-	//	�p��ΤF�X�ӽb�Y  num_conf, conf[i][1], conf[i][2]    
-	
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==2) // ����2  
+    
+	//    計算用了幾個箭頭  num_conf, conf[i][1], conf[i][2]    
+    
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==2) // 先算2  
 	{
 		for(k=1;k<=num_conf;k++)
 		{
@@ -482,9 +474,9 @@ void TRY()
 		}
 	}
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==3) // ��3  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==3) // 算3  
 	{
-		for(n=1;n<=2;n++)tmp_3[n]=0;	
+		for(n=1;n<=2;n++)tmp_3[n]=0;    
 		for(n=1;n<=2;n++)
 		{
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][1])if(conf[k][2]==tmp_how[i][ Comb3[n][1] ])tmp_3[n]+=tmp_vote[k];
@@ -492,7 +484,7 @@ void TRY()
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb3[n][3] ])tmp_3[n]+=tmp_vote[k];
 		}
 
-		Alice = -1;	//	�ոլݳ̨Χ벼�O��  
+		Alice = -1;    //    試試看最佳投票是誰  
 		for(n=1;n<=2;n++)if(tmp_3[n]>Alice)
 		{
 			BEST = n;
@@ -505,10 +497,10 @@ void TRY()
 			if(conf[k][1]==tmp_how[i][2])if(conf[k][2]==tmp_how[i][ Comb3[BEST][2] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb3[BEST][3] ])log(k,i,conf[k][1],conf[k][2]);
 		}
-	
+    
 	}
-	
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==4) // ��4  
+    
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==4) // 算4  
 	{
 		for(n=1;n<=9;n++)tmp_4[n]=0;
 		for(n=1;n<=9;n++)
@@ -517,7 +509,7 @@ void TRY()
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][2])if(conf[k][2]==tmp_how[i][ Comb4[n][2] ])tmp_4[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb4[n][3] ])tmp_4[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][4])if(conf[k][2]==tmp_how[i][ Comb4[n][4] ])tmp_4[n]+=tmp_vote[k];
-		}	
+		}    
 
 		Alice = -1;
 		for(n=1;n<=9;n++)if(tmp_4[n]>Alice)
@@ -525,17 +517,17 @@ void TRY()
 			BEST = n;
 			Alice = tmp_4[n];
 		} 
-		
+        
 		for(k=1;k<=num_conf;k++)
 		{
 			if(conf[k][1]==tmp_how[i][1])if(conf[k][2]==tmp_how[i][ Comb4[BEST][1] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][2])if(conf[k][2]==tmp_how[i][ Comb4[BEST][2] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb4[BEST][3] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][4])if(conf[k][2]==tmp_how[i][ Comb4[BEST][4] ])log(k,i,conf[k][1],conf[k][2]);
-		}	
-	}	
+		}    
+	}    
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==5) // ��5  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==5) // 算5  
 	{
 		for(n=1;n<=44;n++)tmp_5[n]=0;
 		for(n=1;n<=44;n++)
@@ -545,7 +537,7 @@ void TRY()
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb5[n][3] ])tmp_5[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][4])if(conf[k][2]==tmp_how[i][ Comb5[n][4] ])tmp_5[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][5])if(conf[k][2]==tmp_how[i][ Comb5[n][5] ])tmp_5[n]+=tmp_vote[k];
-		}	
+		}    
 
 		Alice = -1;
 		for(n=1;n<=44;n++)if(tmp_5[n]>Alice)
@@ -553,7 +545,7 @@ void TRY()
 			BEST = n;
 			Alice = tmp_5[n];
 		} 
-		
+        
 		for(k=1;k<=num_conf;k++)
 		{
 			if(conf[k][1]==tmp_how[i][1])if(conf[k][2]==tmp_how[i][ Comb5[BEST][1] ])log(k,i,conf[k][1],conf[k][2]);
@@ -561,10 +553,10 @@ void TRY()
 			if(conf[k][1]==tmp_how[i][3])if(conf[k][2]==tmp_how[i][ Comb5[BEST][3] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][4])if(conf[k][2]==tmp_how[i][ Comb5[BEST][4] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][5])if(conf[k][2]==tmp_how[i][ Comb5[BEST][5] ])log(k,i,conf[k][1],conf[k][2]);
-		}	
+		}    
 	}
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==6) // ��6  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==6) // 算6  
 	{
 		for(n=1;n<=265;n++)tmp_6[n]=0;
 		for(n=1;n<=265;n++)
@@ -575,7 +567,7 @@ void TRY()
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][4])if(conf[k][2]==tmp_how[i][ Comb6[n][4] ])tmp_6[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][5])if(conf[k][2]==tmp_how[i][ Comb6[n][5] ])tmp_6[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][6])if(conf[k][2]==tmp_how[i][ Comb6[n][6] ])tmp_6[n]+=tmp_vote[k];
-		}	
+		}    
 
 		Alice = -1;
 		for(n=1;n<=265;n++)if(tmp_6[n]>Alice)
@@ -583,7 +575,7 @@ void TRY()
 			BEST = n;
 			Alice = tmp_6[n];
 		} 
-		
+        
 		for(k=1;k<=num_conf;k++)
 		{
 			if(conf[k][1]==tmp_how[i][1])if(conf[k][2]==tmp_how[i][ Comb6[BEST][1] ])log(k,i,conf[k][1],conf[k][2]);
@@ -592,10 +584,10 @@ void TRY()
 			if(conf[k][1]==tmp_how[i][4])if(conf[k][2]==tmp_how[i][ Comb6[BEST][4] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][5])if(conf[k][2]==tmp_how[i][ Comb6[BEST][5] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][6])if(conf[k][2]==tmp_how[i][ Comb6[BEST][6] ])log(k,i,conf[k][1],conf[k][2]);
-		}	
-	}	
+		}    
+	}    
 
-	for(i=1;i<=7;i++)if(tmp_how[i][0]==7) // ��7  
+	for(i=1;i<=7;i++)if(tmp_how[i][0]==7) // 算7  
 	{
 		for(n=1;n<=1854;n++)tmp_7[n]=0;
 		for(n=1;n<=1854;n++)
@@ -607,7 +599,7 @@ void TRY()
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][5])if(conf[k][2]==tmp_how[i][ Comb7[n][5] ])tmp_7[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][6])if(conf[k][2]==tmp_how[i][ Comb7[n][6] ])tmp_7[n]+=tmp_vote[k];
 			for(k=1;k<=num_conf;k++)if(conf[k][1]==tmp_how[i][7])if(conf[k][2]==tmp_how[i][ Comb7[n][7] ])tmp_7[n]+=tmp_vote[k];
-		}	
+		}    
 
 		Alice = -1;
 		for(n=1;n<=1854;n++)if(tmp_7[n]>Alice)
@@ -615,7 +607,7 @@ void TRY()
 			BEST = n;
 			Alice = tmp_7[n];
 		} 
-		
+        
 		for(k=1;k<=num_conf;k++)
 		{
 			if(conf[k][1]==tmp_how[i][1])if(conf[k][2]==tmp_how[i][ Comb7[BEST][1] ])log(k,i,conf[k][1],conf[k][2]);
@@ -625,10 +617,10 @@ void TRY()
 			if(conf[k][1]==tmp_how[i][5])if(conf[k][2]==tmp_how[i][ Comb7[BEST][5] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][6])if(conf[k][2]==tmp_how[i][ Comb7[BEST][6] ])log(k,i,conf[k][1],conf[k][2]);
 			if(conf[k][1]==tmp_how[i][7])if(conf[k][2]==tmp_how[i][ Comb7[BEST][7] ])log(k,i,conf[k][1],conf[k][2]);
-		}	
+		}    
 	}
-
-	for(i=1;i<=7;i++)if(tmp_how[i][0]>=8) // ��8�H�H�W (fallback)
+    
+	for(i=1;i<=7;i++)if(tmp_how[i][0]>=8) // 算8以上 (fallback)
 	{
 		cnt = tmp_how[i][0];
 		best_shift = 1;
@@ -662,12 +654,12 @@ void TRY()
 
 
 	
-	for(k=1;k<=num_conf;k++)if(tmp_vote[k]>0)tmp_rank[4]++;		//	�b�Y�ϥμƶq 
-	
+	for(k=1;k<=num_conf;k++)if(tmp_vote[k]>0)tmp_rank[4]++;		//	箭頭使用數量       
+    
 	fprintf(OP,"(%d,%d,%d,%d,%d)\n",tmp_rank[1],tmp_rank[2],tmp_rank[3],tmp_rank[4],tmp_rank[5]);
-	
-	//	���� B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
-	
+    
+	//    紀錄 B_rank[6],Best_want[10][8],Best_chg[100][8],B_num_chg 
+    
 	for(i=1;i<=5;i++)
 	{
 		if(B_rank[i]>tmp_rank[i])
