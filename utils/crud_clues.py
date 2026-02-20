@@ -25,6 +25,19 @@ class ClueProcessor:
     users = {user.id: user.name for user in configs.users}
 
     @staticmethod
+    def sync_user_data_from_config() -> None:
+        """從 config.toml 同步玩家名單到 _user_data.txt。"""
+        user_names = [user.name for user in ClueProcessor.configs.users]
+        lines = [
+            f"Total_Players: {len(user_names)}",
+            "Player_Names",
+            *user_names,
+        ]
+
+        with open(ClueProcessor.user_data_path, "w", errors="replace") as f:
+            f.write("\n".join(lines))
+
+    @staticmethod
     def get_users() -> list[str]:
         """取得所有人的名單"""
         with open(

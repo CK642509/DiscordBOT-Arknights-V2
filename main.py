@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from config import Configs
+from utils.crud_clues import ClueProcessor
 
 
 # https://github.com/Rapptz/discord.py/blob/master/examples/advanced_startup.py
@@ -31,6 +32,8 @@ class MyBot(commands.Bot):
 
 def main():
     configs = Configs()
+    ClueProcessor.sync_user_data_from_config()
+    print("User data synchronized from config.toml to _user_data.txt.")
 
     exts = [
         "cogs.clue",
