@@ -60,6 +60,11 @@ class ExchangeCog(commands.Cog):
 
         await self.start_exchange(interaction, defer=True)
 
+        # get the result and send it to the clue channel
+        result = ClueProcessor.get_result()
+        clue_channel = self.bot.get_channel(self.clue_channel_id)
+        await clue_channel.send(result)
+
     async def on_cancel(self, interaction: Interaction):
         await interaction.response.edit_message(content="已取消交換", view=None)
 
