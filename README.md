@@ -6,7 +6,7 @@
 
 https://github.com/CK642509/DiscordBOT-Arknights-V2/raw/main/brag-output/brag.mp4
 
-> 影片無法播放？[點此下載觀看](brag-output/brag.mp4)
+> 影片無法播放？[點此下載觀看](https://github.com/CK642509/DiscordBOT-Arknights-V2/raw/main/brag-output/brag.mp4)
 
 這是基於 [DiscordBOT-Arknights](https://github.com/CK642509/DiscordBOT-Arknights) 所重構的。
 
