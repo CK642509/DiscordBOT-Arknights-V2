@@ -2,6 +2,12 @@
 
 [![Build and Push Docker Image](https://github.com/CK642509/DiscordBOT-Arknights-V2/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/CK642509/DiscordBOT-Arknights-V2/actions/workflows/docker-publish.yml)
 
+使用 [brag](https://github.com/latent-spaces/brag) 製作的介紹影片：
+
+https://github.com/CK642509/DiscordBOT-Arknights-V2/raw/main/brag-output/brag.mp4
+
+> 影片無法播放？[點此下載觀看](https://github.com/CK642509/DiscordBOT-Arknights-V2/raw/main/brag-output/brag.mp4)
+
 這是基於 [DiscordBOT-Arknights](https://github.com/CK642509/DiscordBOT-Arknights) 所重構的。
 
 此 Discord BOT 使用 discord.py 開發，核心演算的演算法使用 C++ 撰寫 (由朋友 Yao 開發)。
