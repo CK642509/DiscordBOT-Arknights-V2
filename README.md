@@ -4,7 +4,7 @@
 
 使用 [brag](https://github.com/latent-spaces/brag) 製作的介紹影片：
 
-https://github.com/CK642509/DiscordBOT-Arknights-V2/raw/main/brag-output/brag.mp4
+https://github.com/user-attachments/assets/4d9b15f0-5de9-4023-a1ec-18ca8e90f92a
 
 > 影片無法播放？[點此下載觀看](https://github.com/CK642509/DiscordBOT-Arknights-V2/raw/main/brag-output/brag.mp4)
 
