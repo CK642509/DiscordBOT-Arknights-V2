@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      /* Resolve to locally-installed CJK + mono system fonts (no external fetch). */
+      @font-face {
+        font-family: "AppCJK";
+        src: local("Microsoft JhengHei UI"), local("Microsoft JhengHei"),
+             local("PingFang TC"), local("Noto Sans TC"), local("Noto Sans CJK TC"),
+             local("Microsoft YaHei");
+      }
+      @font-face {
+        font-family: "AppMono";
+        src: local("Cascadia Mono"), local("Consolas"), local("DejaVu Sans Mono"),
+             local("Courier New");
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: #0e0f11;
+        font-family: "AppCJK", sans-serif;
+      }
+      .mono { font-family: "AppMono", monospace; }
+
+      .hazard {
+        background-image: repeating-linear-gradient(
+          -45deg, #f5d130 0 22px, #1a1b1e 22px 44px
+        );
+      }
+      .scene { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+
+      /* ---------- Scene 1 : title card ---------- */
+      #s1 { background: #1a1b1e; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; }
+      #s1 .col { text-align: center; }
+      #s1 .line { font-weight: 900; color: #f5d130; letter-spacing: 4px;
+                  line-height: 1.18; opacity: 0; }
+      #s1l1, #s1l2 { font-size: 104px; }
+      #s1l3 { font-size: 168px; text-shadow: 0 0 0px rgba(245,209,48,0); }
+      #s1stripe { height: 16px; width: 520px; margin: 40px auto 0;
+                  transform-origin: left center; opacity: 0; }
+
+      /* ---------- Discord chrome (scenes 2-3) ---------- */
+      .discord { background: #313338; }
+      .dc-rail { position: absolute; left: 0; top: 0; width: 88px; height: 100%;
+                 background: #1e1f22; display: flex; flex-direction: column;
+                 align-items: center; padding-top: 26px; gap: 18px; }
+      .dc-pill { width: 52px; height: 52px; border-radius: 28px; background: #313338; }
+      .dc-pill.active { border-radius: 18px; background: #f5d130; }
+      .dc-side { position: absolute; left: 88px; top: 0; width: 300px; height: 100%;
+                 background: #2b2d31; padding: 26px 16px; }
+      .dc-side .srv { color: #f2f3f5; font-weight: 700; font-size: 26px; margin-bottom: 26px; }
+      .dc-side .chan { color: #80848e; font-size: 26px; padding: 9px 12px; border-radius: 8px; }
+      .dc-side .chan.on { color: #f2f3f5; background: #404249; }
+      .dc-main { position: absolute; left: 388px; top: 0; right: 0; height: 100%; }
+      .dc-head { height: 86px; border-bottom: 1px solid #292b2f;
+                 display: flex; align-items: center; padding: 0 34px;
+                 color: #f2f3f5; font-weight: 700; font-size: 32px; gap: 12px; }
+      .dc-head .hash { color: #80848e; font-size: 36px; }
+      .dc-body { padding: 24px 40px; }
+
+      .msg { display: flex; gap: 22px; margin-bottom: 20px; align-items: flex-start; opacity: 0; }
+      .av { width: 56px; height: 56px; border-radius: 50%; flex: 0 0 56px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700; font-size: 24px; }
+      .msg .body { padding-top: 2px; }
+      .msg .who { font-weight: 700; font-size: 27px; margin-bottom: 4px; }
+      .msg .who .ts { color: #80848e; font-weight: 500; font-size: 19px; margin-left: 12px; }
+      .msg .txt { color: #dbdee1; font-size: 30px; letter-spacing: 1px; }
+      .bot-tag { background: #5865f2; color: #fff; font-size: 16px; font-weight: 700;
+                 padding: 2px 7px; border-radius: 5px; margin-left: 10px; vertical-align: middle; }
+
+      #s2cap { position: absolute; bottom: 64px; left: 0; right: 0; text-align: center; opacity: 0; }
+      #s2cap span { display: inline-block; background: rgba(20,21,23,.86);
+                    border: 1px solid rgba(245,209,48,.35);
+                    color: #f5d130; font-weight: 900; font-size: 54px;
+                    letter-spacing: 4px; padding: 18px 44px; border-radius: 14px; }
+
+      /* composer + command chip (scene 3) */
+      #s3composer { position: absolute; left: 428px; right: 40px; bottom: 40px;
+                    height: 76px; background: #383a40; border-radius: 14px;
+                    display: flex; align-items: center; padding: 0 22px; }
+      #s3chip { display: inline-flex; align-items: center; gap: 10px;
+                background: rgba(88,101,242,.22); border: 1px solid rgba(88,101,242,.6);
+                color: #c9cdfb; font-weight: 700; font-size: 30px; letter-spacing: 1px;
+                padding: 8px 16px; border-radius: 10px; opacity: 0; }
+      #s3chip .slash { color: #8a98ff; }
+      #s3caret { width: 3px; height: 38px; background: #c9cdfb; margin-left: 10px; opacity: 0; }
+      .dots { display: inline-flex; gap: 10px; align-items: center; }
+      .dots i { width: 14px; height: 14px; border-radius: 50%; background: #b5bac1; display: block; }
+
+      /* the math reveal slab */
+      #s3slab { position: absolute; inset: 0; display: flex; align-items: center;
+                justify-content: center; }
+      #s3slab .card { background: rgba(14,15,17,.92); border: 1.5px solid rgba(245,209,48,.5);
+                      border-radius: 22px; padding: 54px 92px; text-align: center;
+                      opacity: 0; box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+      #s3slab .mlabel { color: #b5bac1; font-size: 38px; letter-spacing: 5px; margin-bottom: 8px; }
+      #s3numwrap { display: flex; align-items: baseline; justify-content: center; gap: 14px; }
+      #s3num { font-weight: 900; font-size: 184px; color: #f5d130; line-height: 1;
+               letter-spacing: 2px; }
+      #s3slab .munit { color: #f2f3f5; font-weight: 700; font-size: 56px; }
+      #s3mx { color: #e7e9ee; font-size: 46px; margin-top: 26px; letter-spacing: 2px; opacity: 0; }
+      #s3mx b { color: #ff8a8a; }
+      #s3mp { display: inline-block; margin-top: 26px; color: #1a1b1e; background: #f5d130;
+              font-weight: 900; font-size: 46px; letter-spacing: 3px; padding: 12px 30px;
+              border-radius: 12px; opacity: 0; }
+
+      /* ---------- Scene 4 : result as a bot message (same Discord UI) ---------- */
+      #s4msg .botline { color: #f2f3f5; font-size: 30px; font-weight: 500; margin-bottom: 6px; }
+      #s4msg .botline b { color: #3ddc84; font-weight: 700; }
+      .codeblock { background: #1e1f22; border: 1px solid #111214; border-radius: 8px;
+                   padding: 16px 28px; margin-top: 8px; display: inline-block; }
+      .cg { opacity: 0; }
+      .cl { display: flex; align-items: center; font-size: 26px; line-height: 1.5; color: #c9ccd1; }
+      .cl .gv { width: 188px; color: #e3e5e8; font-weight: 600; }
+      .cl .ar { width: 70px; text-align: center; color: #f5d130; font-weight: 700; }
+      .cl .cv { color: #f5d130; font-weight: 700; letter-spacing: 2px; }
+      .csep { color: #4a4d54; font-size: 22px; line-height: 1.4; letter-spacing: 1px; }
+
+      /* ---------- Scene 5 : logo ---------- */
+      #s5 { background: #1a1b1e; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; }
+      #s5logo { font-weight: 900; font-size: 134px; color: #f5d130; letter-spacing: 8px; opacity: 0; }
+      #s5stripe { height: 14px; width: 460px; margin: 34px 0;
+                  transform-origin: center; opacity: 0; }
+      #s5tag { color: #dbdee1; font-size: 50px; letter-spacing: 6px; opacity: 0; font-weight: 500; }
+      #s5ver { position: absolute; right: 60px; bottom: 50px; color: #5b5e66;
+               font-size: 30px; letter-spacing: 3px; opacity: 0; }
+      #s5fade { position: absolute; inset: 0; background: #0e0f11; opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="22.5"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- ================= SCENE 1 : TITLE ================= -->
+      <div id="s1" class="scene clip" data-start="0" data-duration="4.0" data-track-index="1">
+        <div class="col">
+          <div id="s1l1" class="line">8 名玩家</div>
+          <div id="s1l2" class="line">7 種線索</div>
+          <div id="s1l3" class="line">1 個最佳解</div>
+          <div id="s1stripe" class="hazard"></div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 2 : THE NOISE ================= -->
+      <div id="s2" class="scene clip discord" data-start="4.0" data-duration="4.6" data-track-index="2">
+        <div class="dc-rail">
+          <div class="dc-pill active"></div>
+          <div class="dc-pill"></div>
+          <div class="dc-pill"></div>
+        </div>
+        <div class="dc-side">
+          <div class="srv">羅德島幹員群</div>
+          <div class="chan on"># 線索頻道</div>
+          <div class="chan"># 一般</div>
+          <div class="chan"># 公告</div>
+        </div>
+        <div class="dc-main">
+          <div class="dc-head"><span class="hash">#</span> 線索頻道</div>
+          <div class="dc-body">
+            <div class="msg" id="s2m1"><div class="av" style="background:#e0556b">P1</div><div class="body"><div class="who" style="color:#e0556b">Player1<span class="ts">今天 09:01</span></div><div class="txt mono">123567 123567</div></div></div>
+            <div class="msg" id="s2m2"><div class="av" style="background:#4f9bf5">P2</div><div class="body"><div class="who" style="color:#4f9bf5">Player2<span class="ts">今天 09:01</span></div><div class="txt mono">1234 134</div></div></div>
+            <div class="msg" id="s2m3"><div class="av" style="background:#43b581">P3</div><div class="body"><div class="who" style="color:#43b581">Player3<span class="ts">今天 09:02</span></div><div class="txt mono">11345666 0</div></div></div>
+            <div class="msg" id="s2m4"><div class="av" style="background:#faa61a">P4</div><div class="body"><div class="who" style="color:#faa61a">Player4<span class="ts">今天 09:02</span></div><div class="txt mono">12222337 1</div></div></div>
+            <div class="msg" id="s2m5"><div class="av" style="background:#9b6cf2">P5</div><div class="body"><div class="who" style="color:#9b6cf2">Player5<span class="ts">今天 09:03</span></div><div class="txt mono">122334456 5</div></div></div>
+            <div class="msg" id="s2m6"><div class="av" style="background:#1ab7a6">P6</div><div class="body"><div class="who" style="color:#1ab7a6">Player6<span class="ts">今天 09:03</span></div><div class="txt mono">67 67</div></div></div>
+            <div class="msg" id="s2m7"><div class="av" style="background:#eb6f4d">P7</div><div class="body"><div class="who" style="color:#eb6f4d">Player7<span class="ts">今天 09:04</span></div><div class="txt mono">123 0</div></div></div>
+            <div class="msg" id="s2m8"><div class="av" style="background:#c77dff">P8</div><div class="body"><div class="who" style="color:#c77dff">Player8<span class="ts">今天 09:04</span></div><div class="txt mono">123 123</div></div></div>
+          </div>
+        </div>
+        <div id="s2cap"><span>人類很難算出該怎麼交換...</span></div>
+      </div>
+
+      <!-- ================= SCENE 3 : COMMAND + MATH REVEAL ================= -->
+      <div id="s3" class="scene clip discord" data-start="8.6" data-duration="6.0" data-track-index="3">
+        <div class="dc-rail">
+          <div class="dc-pill active"></div>
+          <div class="dc-pill"></div>
+          <div class="dc-pill"></div>
+        </div>
+        <div class="dc-side">
+          <div class="srv">羅德島幹員群</div>
+          <div class="chan on"># 線索頻道</div>
+          <div class="chan"># 一般</div>
+          <div class="chan"># 公告</div>
+        </div>
+        <div class="dc-main">
+          <div class="dc-head"><span class="hash">#</span> 線索頻道</div>
+          <div class="dc-body">
+            <div class="msg" id="s3bot"><div class="av" style="background:#5865f2">B</div><div class="body"><div class="who" style="color:#f2f3f5">明日方舟Bot<span class="bot-tag">APP</span><span class="ts">今天 09:05</span></div><div class="txt" style="color:#f2f3f5;font-weight:700">開始計算！</div></div></div>
+            <div class="msg" id="s3typing"><div class="av" style="background:#5865f2">B</div><div class="body"><div class="who" style="color:#f2f3f5">明日方舟Bot<span class="bot-tag">APP</span></div><div class="txt" style="color:#b5bac1"><span class="dots"><i></i><i></i><i></i></span> &nbsp;正在輸入…</div></div></div>
+          </div>
+        </div>
+        <div id="s3composer">
+          <span id="s3chip"><span class="slash">/</span>exchange</span>
+          <span id="s3caret"></span>
+        </div>
+        <div id="s3slab">
+          <div class="card">
+            <div class="mlabel">光是 8 人「錯排」就有</div>
+            <div id="s3numwrap"><div id="s3num">0</div><div class="munit">種</div></div>
+            <div id="s3mx">再 <b>× 每人的線索組合</b> → 大到無法暴力窮舉</div>
+            <div id="s3mp">所以用 C++ ＋ 最佳化演算法</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 4 : RESULT as a bot message (results.txt) ================= -->
+      <div id="s4" class="scene clip discord" data-start="14.6" data-duration="5.2" data-track-index="4">
+        <div class="dc-rail">
+          <div class="dc-pill active"></div>
+          <div class="dc-pill"></div>
+          <div class="dc-pill"></div>
+        </div>
+        <div class="dc-side">
+          <div class="srv">羅德島幹員群</div>
+          <div class="chan on"># 線索頻道</div>
+          <div class="chan"># 一般</div>
+          <div class="chan"># 公告</div>
+        </div>
+        <div class="dc-main">
+          <div class="dc-head"><span class="hash">#</span> 線索頻道</div>
+          <div class="dc-body">
+            <div class="msg" id="s4msg">
+              <div class="av" style="background:#5865f2">B</div>
+              <div class="body">
+                <div class="who" style="color:#f2f3f5">明日方舟Bot<span class="bot-tag">APP</span><span class="ts">今天 09:06</span></div>
+                <div class="botline"><b>✅ 計算完成！</b>　最佳交換方案如下：</div>
+                <div class="codeblock mono">
+                  <div class="cg" id="s4g1">
+                    <div class="cl"><span class="gv">Player1</span><span class="ar">--&gt;</span><span class="gv">Player3</span><span class="cv">6</span></div>
+                    <div class="cl"><span class="gv">Player1</span><span class="ar">--&gt;</span><span class="gv">Player5</span><span class="cv">1235</span></div>
+                    <div class="cl"><span class="gv">Player1</span><span class="ar">--&gt;</span><span class="gv">Player6</span><span class="cv">7</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g2">
+                    <div class="cl"><span class="gv">Player2</span><span class="ar">--&gt;</span><span class="gv">Player3</span><span class="cv">134</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g3">
+                    <div class="cl"><span class="gv">Player3</span><span class="ar">--&gt;</span><span class="gv">Player2</span><span class="cv">134</span></div>
+                    <div class="cl"><span class="gv">Player3</span><span class="ar">--&gt;</span><span class="gv">Player6</span><span class="cv">6</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g4">
+                    <div class="cl"><span class="gv">Player4</span><span class="ar">--&gt;</span><span class="gv">Player7</span><span class="cv">123</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g5">
+                    <div class="cl"><span class="gv">Player5</span><span class="ar">--&gt;</span><span class="gv">Player1</span><span class="cv">1235</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g6">
+                    <div class="cl"><span class="gv">Player6</span><span class="ar">--&gt;</span><span class="gv">Player1</span><span class="cv">67</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g7">
+                    <div class="cl"><span class="gv">Player7</span><span class="ar">--&gt;</span><span class="gv">Player8</span><span class="cv">123</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                  <div class="cg" id="s4g8">
+                    <div class="cl"><span class="gv">Player8</span><span class="ar">--&gt;</span><span class="gv">Player4</span><span class="cv">123</span></div>
+                    <div class="csep">--------------------------</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= SCENE 5 : LOGO ================= -->
+      <div id="s5" class="scene clip" data-start="19.8" data-duration="2.7" data-track-index="5">
+        <div id="s5logo">明日方舟線索交換器</div>
+        <div id="s5stripe" class="hazard"></div>
+        <div id="s5tag">把每日換線索，變成一行指令。</div>
+        <div id="s5ver" class="mono">ver 1.2</div>
+        <div id="s5fade"></div>
+      </div>
+
+      <!-- ================= AUDIO ================= -->
+      <audio id="music" data-start="0" data-duration="22.5" data-track-index="10" data-volume="0.30" src="assets/music/happy-beats-business-moves-vol-11-by-ende-dot-app.mp3"></audio>
+
+      <!-- Scene 1 sfx -->
+      <audio id="sfx1" data-start="0.75" data-duration="1" data-track-index="11" data-volume="0.5" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx2" data-start="1.80" data-duration="1" data-track-index="12" data-volume="0.5" src="assets/sfx/interface/drop_002.ogg"></audio>
+      <audio id="sfx3" data-start="2.86" data-duration="1.2" data-track-index="13" data-volume="0.66" src="assets/sfx/impact/impactSoft_medium_000.ogg"></audio>
+
+      <!-- Scene 2 message pops (beat grid) -->
+      <audio id="sfx4" data-start="4.23" data-duration="0.6" data-track-index="14" data-volume="0.38" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx5" data-start="4.75" data-duration="0.6" data-track-index="15" data-volume="0.38" src="assets/sfx/interface/drop_002.ogg"></audio>
+      <audio id="sfx6" data-start="5.28" data-duration="0.6" data-track-index="16" data-volume="0.38" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx7" data-start="5.80" data-duration="0.6" data-track-index="17" data-volume="0.38" src="assets/sfx/interface/drop_002.ogg"></audio>
+      <audio id="sfx8" data-start="6.34" data-duration="0.6" data-track-index="18" data-volume="0.38" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx9" data-start="6.86" data-duration="0.6" data-track-index="19" data-volume="0.38" src="assets/sfx/interface/drop_002.ogg"></audio>
+      <audio id="sfx10" data-start="7.38" data-duration="0.6" data-track-index="20" data-volume="0.38" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx11" data-start="7.91" data-duration="0.6" data-track-index="21" data-volume="0.38" src="assets/sfx/interface/drop_002.ogg"></audio>
+
+      <!-- Scene 3 typing + math reveal -->
+      <audio id="sfx12" data-start="8.95" data-duration="0.3" data-track-index="22" data-volume="0.42" src="assets/sfx/keyboard/keypress-001.wav"></audio>
+      <audio id="sfx13" data-start="9.07" data-duration="0.3" data-track-index="23" data-volume="0.42" src="assets/sfx/keyboard/keypress-003.wav"></audio>
+      <audio id="sfx14" data-start="9.19" data-duration="0.3" data-track-index="24" data-volume="0.42" src="assets/sfx/keyboard/keypress-002.wav"></audio>
+      <audio id="sfx15" data-start="9.31" data-duration="0.3" data-track-index="25" data-volume="0.42" src="assets/sfx/keyboard/keypress-005.wav"></audio>
+      <audio id="sfx16" data-start="9.43" data-duration="0.3" data-track-index="26" data-volume="0.42" src="assets/sfx/keyboard/keypress-004.wav"></audio>
+      <audio id="sfx17" data-start="9.62" data-duration="0.5" data-track-index="27" data-volume="0.5" src="assets/sfx/interface/click_001.ogg"></audio>
+      <audio id="sfx18" data-start="11.62" data-duration="0.9" data-track-index="28" data-volume="0.52" src="assets/sfx/interface/drop_001.ogg"></audio>
+      <audio id="sfx19" data-start="12.55" data-duration="1.2" data-track-index="29" data-volume="0.72" src="assets/sfx/impact/impactSoft_medium_001.ogg"></audio>
+      <audio id="sfx20" data-start="13.45" data-duration="1.0" data-track-index="30" data-volume="0.6" src="assets/sfx/impact/impactSoft_medium_000.ogg"></audio>
+
+      <!-- Scene 4 bot result message + printout -->
+      <audio id="sfx21" data-start="14.82" data-duration="1.4" data-track-index="31" data-volume="0.72" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+      <audio id="sfx22" data-start="15.18" data-duration="0.6" data-track-index="32" data-volume="0.5" src="assets/sfx/casino/card-place-1.ogg"></audio>
+      <audio id="sfx23" data-start="15.50" data-duration="0.6" data-track-index="33" data-volume="0.5" src="assets/sfx/casino/card-place-2.ogg"></audio>
+      <audio id="sfx24" data-start="15.98" data-duration="0.6" data-track-index="34" data-volume="0.5" src="assets/sfx/casino/card-place-3.ogg"></audio>
+      <audio id="sfx25" data-start="16.30" data-duration="0.6" data-track-index="35" data-volume="0.5" src="assets/sfx/casino/card-place-4.ogg"></audio>
+
+      <!-- Scene 5 logo settle -->
+      <audio id="sfx26" data-start="19.95" data-duration="1.4" data-track-index="36" data-volume="0.55" src="assets/sfx/impact/impactSoft_medium_000.ogg"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---------- Scene 1 ---------- */
+      tl.fromTo("#s1l1", { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.34, ease: "power3.out" }, 0.75);
+      tl.fromTo("#s1l2", { opacity: 0, y: 34 },
+        { opacity: 1, y: 0, duration: 0.34, ease: "power3.out" }, 1.80);
+      // final hook line enters earlier so it holds ~1.1s before the cut at 4.0s
+      tl.fromTo("#s1l3", { opacity: 0, scale: 0.86 },
+        { opacity: 1, scale: 1, duration: 0.42, ease: "back.out(1.6)" }, 2.86);
+      tl.to("#s1l3", { textShadow: "0 0 38px rgba(245,209,48,0.55)", duration: 0.5 }, 2.92);
+      tl.fromTo("#s1stripe", { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 0.4, ease: "power2.out" }, 2.98);
+
+      /* ---------- Scene 2 : 8 messages on the beat grid ---------- */
+      // beat-grid: 4.23, 4.75, 5.28, 5.80, 6.34, 6.86, 7.38, 7.91
+      [4.23, 4.75, 5.28, 5.80, 6.34, 6.86, 7.38, 7.91].forEach((t, i) => {
+        tl.fromTo("#s2m" + (i + 1), { opacity: 0, y: 16 },
+          { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }, t);
+      });
+      tl.fromTo("#s2cap", { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 6.1);
+
+      /* ---------- Scene 3 : command, typing, math reveal ---------- */
+      tl.fromTo("#s3chip", { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.22, ease: "power2.out" }, 8.9);
+      tl.to("#s3caret", { opacity: 1, duration: 0.05 }, 8.95);
+      tl.to("#s3caret", { opacity: 0, duration: 0.18, repeat: 3, yoyo: true }, 9.0);
+      tl.to("#s3chip", { scale: 1.06, opacity: 0, duration: 0.22, ease: "power1.in" }, 9.6);
+      tl.set("#s3caret", { opacity: 0 }, 9.6);
+      tl.fromTo("#s3bot", { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.28, ease: "power2.out" }, 9.72);
+      tl.fromTo("#s3typing", { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.28, ease: "power2.out" }, 10.1);
+      tl.to("#s3typing .dots i", {
+        y: -8, opacity: 1, duration: 0.24, ease: "sine.inOut",
+        stagger: { each: 0.12, repeat: 3, yoyo: true }
+      }, 10.4);
+      // clear chrome before slab
+      tl.to("#s3composer", { opacity: 0, duration: 0.3 }, 11.0);
+      tl.to("#s3typing", { opacity: 0, duration: 0.3 }, 11.0);
+      tl.to("#s3bot", { opacity: 0, duration: 0.3 }, 11.0);
+      // slab + count-up to 14,833 (D(8) derangements)
+      tl.fromTo("#s3slab .card", { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.36, ease: "power2.out" }, 11.05);
+      const counter = { v: 0 };
+      // beat-grid: number settles ~11.60s
+      tl.to(counter, {
+        v: 14833, duration: 0.55, ease: "power2.out", snap: { v: 1 },
+        onUpdate: () => { document.querySelector("#s3num").textContent = Math.round(counter.v).toLocaleString(); }
+      }, 11.1);
+      tl.to("#s3num", { scale: 1.05, duration: 0.14, ease: "power2.out" }, 11.6)
+        .to("#s3num", { scale: 1, duration: 0.2, ease: "power2.inOut" }, 11.74);
+      // "× clue combos → too big to brute force" — land on strong cue
+      // beat-locked: 12.65s (strong cue)
+      tl.fromTo("#s3mx", { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.34, ease: "power2.out" }, 12.5);
+      // the punch: C++ + optimized algorithm
+      tl.fromTo("#s3mp", { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.34, ease: "back.out(1.5)" }, 13.45);
+
+      /* ---------- Scene 4 : bot posts the result (results.txt) ---------- */
+      // the bot message arrives in the channel
+      tl.fromTo("#s4msg", { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.34, ease: "power2.out" }, 14.8);
+      // the 8 giver-groups print into the code block one by one, then HOLD for reading
+      for (let i = 1; i <= 8; i++) {
+        tl.fromTo("#s4g" + i, { opacity: 0, y: 8 },
+          { opacity: 1, y: 0, duration: 0.26, ease: "power2.out" }, 15.15 + (i - 1) * 0.16);
+      }
+
+      /* ---------- Scene 5 : logo ---------- */
+      // beat-grid: logo settles ~20.02s
+      tl.fromTo("#s5logo", { opacity: 0, y: 22, scale: 0.96 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.42, ease: "power3.out" }, 19.9);
+      tl.fromTo("#s5stripe", { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: 0.4, ease: "power2.out" }, 20.2);
+      tl.fromTo("#s5tag", { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 20.45);
+      tl.to("#s5ver", { opacity: 1, duration: 0.3 }, 20.8);
+      tl.to("#s5fade", { opacity: 1, duration: 0.65, ease: "power2.in" }, 21.8);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+我寫了一個 Discord BOT，幫《明日方舟》玩家算出線索交換的「數學最佳解」。
+
+光是 8 人之間「誰送給誰」的錯排排列就有 14,833 種，再乘上每個人能送出的線索組合，數量大到不可能暴力窮舉 —— 所以核心用 C++ ＋ 最佳化演算法加速。
+
+大家把線索貼進頻道，一行指令 /exchange，BOT 直接公告誰該把哪幾號線索給誰。把每天的換線索，變成一行指令。
+
+ver 1.2 🟡
+
+---
+
+EN: I built a Discord bot that finds the mathematically optimal Arknights clue trade. The "who-gives-to-whom" layer alone is 14,833 derangements for 8 players — times every clue-bundle combination, it's far too big to brute-force, so the core runs in C++ with an optimized algorithm. Drop clues in the channel, type /exchange, and the bot posts exactly who should give which clues to whom. 🟡
