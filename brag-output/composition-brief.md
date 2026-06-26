@@ -10,7 +10,7 @@ Create a ~22.5s deadpan yc-parody launch video for an Arknights clue-exchange Di
 - Duration: ~22.5 seconds
 
 ## Source Material
-- Project root: `C:/Users/johnlin_de-cloak/Desktop/project/others/DiscordBOT-Arknights-V2`
+- Project root: repository root of this Git repository
 - Primary files read: README.md, cogs/exchange.py, cogs/clue.py, utils/crud_clues.py, utils/exchange/input.txt, exchange_algo/main.cpp
 - Product name: 明日方舟線索交換器 (Arknights Clue Exchanger)
 - Tagline / strongest claim: 把每日換線索，變成一行指令。/ 1,855 種組合，用 C++ 暴力解。
