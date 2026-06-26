@@ -31,7 +31,7 @@ entry → key action → result, recreated as real Discord UI:
 - Interpretation: structured, confident, straight-faced delivery; hard cuts, big declarative type, no jokey motion. The humor is in applying serious engineering theater to a mobile-game side quest. Quiet, tasteful audio — never zany.
 
 ## Format: landscape — 1920x1080
-## Duration: ~19.5 seconds
+## Duration: ~22.5 seconds
 
 ## Visual identity (from the project)
 - Background: Discord dark `#313338` (chat), sidebar `#2b2d31`, near-black title cards `#1a1b1e`
