@@ -1,13 +1,13 @@
 # Hyperframes Composition Brief: 明日方舟線索交換器
 
 ## Objective
-Create a ~19.5s deadpan yc-parody launch video for an Arknights clue-exchange Discord bot whose punchline is that it really does brute-force the optimal trade in C++.
+Create a ~22.5s deadpan yc-parody launch video for an Arknights clue-exchange Discord bot whose punchline is that it really does brute-force the optimal trade in C++.
 
 ## Output
 - Composition directory: `brag-output/composition/`
 - Rendered video: `brag-output/brag.mp4`
 - Format: landscape — 1920x1080
-- Duration: ~19.5 seconds
+- Duration: ~22.5 seconds
 
 ## Source Material
 - Project root: `C:/Users/johnlin_de-cloak/Desktop/project/others/DiscordBOT-Arknights-V2`
