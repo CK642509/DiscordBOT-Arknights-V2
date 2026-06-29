@@ -69,4 +69,4 @@ Scene summary:
 - Audio files: copy chosen music + SFX into `brag-output/composition/assets/`.
 
 ## Hyperframes Instructions
-Use the current hyperframes CLI workflow (init / lint / inspect / render). Single 1920x1080 composition, GSAP timeline registered on `window.__timelines["main"]` (keyed by the root element's `data-composition-id`), paused. Show real Discord UI + verbatim copy. Keep all CJK text legible (hold each readable line ≥0.8s). Beat-lock 3 major reveals within ±0.15s; snap sequential pops/arrows to the beat grid within ±0.10s but hold the full set afterward so rows stay readable. Lint + inspect before render.
+Use the current hyperframes CLI workflow (init / lint / inspect / render). Single 1920x1080 composition, GSAP timeline registered on `window.__timelines["main"]` (matches the root element's `data-composition-id="main"`), paused. Show real Discord UI + verbatim copy. Keep all CJK text legible (hold each readable line ≥0.8s). Beat-lock 3 major reveals within ±0.15s; snap sequential pops/arrows to the beat grid within ±0.10s but hold the full set afterward so rows stay readable. Lint + inspect before render.
